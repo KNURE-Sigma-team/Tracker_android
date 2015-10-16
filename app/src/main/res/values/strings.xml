@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">WimK</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="loading">Loading...</string>
+    <string name="login">Login</string>
+</resources>
