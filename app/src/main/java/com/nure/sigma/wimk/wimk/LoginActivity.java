@@ -30,11 +30,13 @@ public class LoginActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        context = this;
         settings = getSharedPreferences("password", 0);
+
+        super.onCreate(savedInstanceState);
 
         if(settings.getBoolean("isFirstEnter", true)){
             // Login if first app enter.
-            super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_login);
 
             usernameEditText = (EditText) findViewById(R.id.username_editText);
@@ -76,7 +78,6 @@ public class LoginActivity extends Activity {
     }
 
     private void moveToMainActivity(){
-        //TODO move to MainActivity
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
