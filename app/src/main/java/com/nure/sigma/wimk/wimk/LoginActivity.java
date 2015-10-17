@@ -3,6 +3,7 @@ package com.nure.sigma.wimk.wimk;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -75,7 +76,9 @@ public class LoginActivity extends Activity {
     }
 
     private void moveToMainActivity(){
-        //TODO
+        //TODO move to MainActivity
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
 

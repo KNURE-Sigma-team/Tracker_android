@@ -10,6 +10,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/username_editText"
+        android:hint="@string/username_hint"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 
@@ -17,13 +18,14 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/password_editText"
+        android:hint="@string/password_hint"
         android:layout_below="@+id/username_editText"
         android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/login"
+        android:text="@string/login_button"
         android:id="@+id/login_btn"
         android:layout_below="@+id/password_editText"
         android:layout_centerHorizontal="true" />
