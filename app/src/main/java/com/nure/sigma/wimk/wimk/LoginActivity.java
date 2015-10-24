@@ -7,15 +7,20 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.util.Pair;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class LoginActivity extends Activity {
 
@@ -27,6 +32,8 @@ public class LoginActivity extends Activity {
     EditText usernameEditText;
     EditText passwordEditText;
 
+    String serverURL = "http://178.165.37.203:8080/wimk/mobile_authorization";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -35,7 +42,7 @@ public class LoginActivity extends Activity {
 
         super.onCreate(savedInstanceState);
 
-        if(settings.getBoolean("isFirstEnter", true)){
+        //if(settings.getBoolean("isFirstEnter", true)){
             // Login if first app enter.
             setContentView(R.layout.activity_login);
 
@@ -46,13 +53,14 @@ public class LoginActivity extends Activity {
             loginButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    login(usernameEditText.getText().toString(), passwordEditText.getText().toString());
+                    new LoginAsyncTask().execute();
+                    //login(usernameEditText.getText().toString(), passwordEditText.getText().toString());
                 }
             });
-        }
-        else{
-            moveToMainActivity();
-        }
+        //}
+       // else{
+        //    moveToMainActivity();
+        //}
     }
 
     private void login(String username, String password){
@@ -71,7 +79,6 @@ public class LoginActivity extends Activity {
             moveToMainActivity();
         }
         else{
-            // Logins is unsccessfull.
             usernameEditText.setText(EMPTY_STRING);
             passwordEditText.setText(EMPTY_STRING);
         }
@@ -89,6 +96,9 @@ public class LoginActivity extends Activity {
         private String password;
         private ProgressDialog loadingDialog;
 
+        public LoginAsyncTask() {
+
+        }
         public LoginAsyncTask(String username, String password) {
             this.username = username;
             this.password = password;
@@ -104,8 +114,70 @@ public class LoginActivity extends Activity {
         @Override
         protected Boolean doInBackground(Void... params) {
 
-            // TODO server request
+            URL obj = null;
+            try {
+                obj = new URL(serverURL);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
 
+            HttpURLConnection connection = null;
+            try {
+                connection = (HttpURLConnection) obj.openConnection();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                connection.setRequestMethod("POST");
+            } catch (java.net.ProtocolException e) {
+                e.printStackTrace();
+            }
+
+            StringBuilder urlParameters = new StringBuilder();
+
+            urlParameters.append("loginParent");
+            urlParameters.append("=");
+            urlParameters.append("alik");
+            urlParameters.append("&");
+            urlParameters.append("loginChild");
+            urlParameters.append("=");
+            urlParameters.append("test1");
+            urlParameters.append("&");
+            urlParameters.append("password");
+            urlParameters.append("=");
+            urlParameters.append("test1");
+
+            connection.setDoOutput(true);
+
+            DataOutputStream wr = null;
+            try {
+                wr = new DataOutputStream(connection.getOutputStream());
+                wr.writeBytes(urlParameters.toString());
+                wr.flush();
+                wr.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            String response;
+            try {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+
+                // Read Server Response
+                while((line = reader.readLine()) != null)
+                {
+                    // Append server response in string
+                    sb.append(line + "\n");
+                }
+                response = sb.toString();
+                Log.i("SERVICE", response);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             return true;
         }

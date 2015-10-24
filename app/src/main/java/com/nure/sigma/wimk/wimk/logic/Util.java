@@ -1,9 +1,12 @@
 package com.nure.sigma.wimk.wimk.logic;
 
+import android.util.Log;
 import android.util.Pair;
 
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -13,7 +16,7 @@ import java.util.Map;
 /**
  * Created by andrew on 17.10.15.
  */
-public class DataSender {
+public class Util {
 
     public static final int OK = 0;
     public static final int BAD_URL = 101;
@@ -23,22 +26,12 @@ public class DataSender {
     public static final int OUTPUT_STREAM_FAIL = 105;
     public static final int GET_RESPONSE_FAIL = 106;
 
-    private static DataSender ourInstance = new DataSender();
-
-    public static DataSender getInstance() {
-        return ourInstance;
-    }
-
-    private DataSender() {
-    }
-
-    public int HttpPostQuery(String serverUrl, Collection<Pair<String, String>> pairs){
+    public static int HttpPostRequest(String serverUrl, Collection<Pair<String, String>> pairs){
         URL obj = null;
         try {
             obj = new URL(serverUrl);
         } catch (MalformedURLException e) {
             e.printStackTrace();
-            return BAD_URL;
         }
 
         HttpURLConnection connection = null;
@@ -46,18 +39,15 @@ public class DataSender {
             connection = (HttpURLConnection) obj.openConnection();
         } catch (IOException e) {
             e.printStackTrace();
-            return OPEN_CONNECTION_FAIL;
         }
 
         if(connection == null){
-            return NULL_CONNECTION;
         }
 
         try {
             connection.setRequestMethod("POST");
         } catch (java.net.ProtocolException e) {
             e.printStackTrace();
-            return SET_POST_FAIL;
         }
 
         StringBuilder urlParameters = new StringBuilder();
@@ -83,18 +73,26 @@ public class DataSender {
             wr.close();
         } catch (IOException e) {
             e.printStackTrace();
-            return OUTPUT_STREAM_FAIL;
         }
 
         String response = null;
 
         try {
-            response = connection.getResponseMessage();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+
+            // Read Server Response
+            while((line = reader.readLine()) != null)
+            {
+                // Append server response in string
+                sb.append(line + "\n");
+            }
+            response = sb.toString();
         } catch (IOException e) {
             e.printStackTrace();
-            return GET_RESPONSE_FAIL;
         }
-        return OK;
+        return Integer.getInteger(response);
     }
 
 
