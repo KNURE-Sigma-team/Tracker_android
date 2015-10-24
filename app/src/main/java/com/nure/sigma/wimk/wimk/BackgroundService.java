@@ -14,6 +14,7 @@ import android.util.Pair;
 
 import com.nure.sigma.wimk.wimk.logic.Util;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -43,7 +44,6 @@ public class BackgroundService extends IntentService {
 
         Log.i(TAG, "Service Started!");
         String url = intent.getStringExtra("url");
-        String[] results = downloadData(url);
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         try {
             locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -59,15 +59,13 @@ public class BackgroundService extends IntentService {
         }
         logRecord(formatBatteryLevel(batteryLevel));
         logRecord("-------------------------------------------------------------");
-        if (null != results && results.length > 0) {
-            Log.i("result", results.toString());
-        }
+
         List<Pair<String,String>> pairs = new ArrayList<>();
         pairs.add(new Pair<String, String>("idChild",String.valueOf(idChild)));
         pairs.add(new Pair<String, String>("longitude",String.valueOf(locationNETWORK.getLongitude())));
         pairs.add(new Pair<String, String>("latitude",String.valueOf(locationNETWORK.getLatitude())));
         pairs.add(new Pair<String, String>("battery_level",String.valueOf(batteryLevel)));
-        pairs.add(new Pair<String, String>("time",new Date(locationNETWORK.getTime()).toLocaleString()));
+        pairs.add(new Pair<String, String>("time",(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date(locationNETWORK.getTime()))));
 
         Util.HttpPostRequest(serverURL,pairs);
         Log.i(TAG, "Service Stopping!");
@@ -121,9 +119,4 @@ public class BackgroundService extends IntentService {
         return String.format("Battery level = %1$.2f",level);
     }
 
-
-    private String[] downloadData(String requestUrl)  {
-        String[] result = null;
-        return result;
-    }
 }

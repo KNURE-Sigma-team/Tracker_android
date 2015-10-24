@@ -92,7 +92,13 @@ public class Util {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return Integer.getInteger(response);
+        try {
+            Integer i = Integer.getInteger(response);
+            return i;
+        }
+        catch (NullPointerException e){
+            return 0;
+        }
     }
 
 
