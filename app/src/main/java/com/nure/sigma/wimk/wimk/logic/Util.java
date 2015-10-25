@@ -32,6 +32,7 @@ public class Util {
             obj = new URL(serverUrl);
         } catch (MalformedURLException e) {
             e.printStackTrace();
+            return -1;
         }
 
         HttpURLConnection connection = null;
@@ -39,6 +40,7 @@ public class Util {
             connection = (HttpURLConnection) obj.openConnection();
         } catch (IOException e) {
             e.printStackTrace();
+            return -1;
         }
 
         if(connection == null){
@@ -48,6 +50,7 @@ public class Util {
             connection.setRequestMethod("POST");
         } catch (java.net.ProtocolException e) {
             e.printStackTrace();
+            return -1;
         }
 
         StringBuilder urlParameters = new StringBuilder();
@@ -73,6 +76,7 @@ public class Util {
             wr.close();
         } catch (IOException e) {
             e.printStackTrace();
+            return -1;
         }
 
         String response = null;
@@ -91,13 +95,14 @@ public class Util {
             response = sb.toString();
         } catch (IOException e) {
             e.printStackTrace();
+            return -1;
         }
         try {
             Integer i = Integer.getInteger(response);
             return i;
         }
         catch (NullPointerException e){
-            return 0;
+            return -1;
         }
     }
 

@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.BatteryManager;
@@ -16,7 +17,6 @@ import com.nure.sigma.wimk.wimk.logic.Util;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -31,7 +31,7 @@ public class BackgroundService extends IntentService {
 
     Location locationGPS = null;
     Location locationNETWORK = null;
-    public static int idChild = 5;
+    public static int idChild;
     String serverURL = "http://178.165.37.203:8080/wimk/mobile_get_point";
 
 
@@ -43,7 +43,6 @@ public class BackgroundService extends IntentService {
     protected void onHandleIntent(Intent intent) {
 
         Log.i(TAG, "Service Started!");
-        String url = intent.getStringExtra("url");
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         try {
             locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -60,15 +59,17 @@ public class BackgroundService extends IntentService {
         logRecord(formatBatteryLevel(batteryLevel));
         logRecord("-------------------------------------------------------------");
 
+        SharedPreferences settings = getSharedPreferences("password",0);
+        idChild = settings.getInt("idChild",0);
         List<Pair<String,String>> pairs = new ArrayList<>();
-        pairs.add(new Pair<String, String>("idChild",String.valueOf(idChild)));
-        pairs.add(new Pair<String, String>("longitude",String.valueOf(locationNETWORK.getLongitude())));
-        pairs.add(new Pair<String, String>("latitude",String.valueOf(locationNETWORK.getLatitude())));
-        pairs.add(new Pair<String, String>("battery_level",String.valueOf(batteryLevel)));
-        pairs.add(new Pair<String, String>("time",(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date(locationNETWORK.getTime()))));
+        pairs.add(new Pair<>("idChild",String.valueOf(idChild)));
+        pairs.add(new Pair<>("longitude",String.valueOf(locationNETWORK.getLongitude())));
+        pairs.add(new Pair<>("latitude",String.valueOf(locationNETWORK.getLatitude())));
+        pairs.add(new Pair<>("battery_level",String.valueOf(batteryLevel)));
+        pairs.add(new Pair<>("time",(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date(locationNETWORK.getTime()))));
 
         Util.HttpPostRequest(serverURL,pairs);
-        Log.i(TAG, "Service Stopping!");
+        //Log.i(TAG, "Service Stopping!");
 
         Intent notificationIntent = new Intent(this, BackgroundService.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);

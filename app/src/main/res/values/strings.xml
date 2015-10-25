@@ -7,6 +7,6 @@
     <string name="login_button">Login</string>
     <string name="username_hint">Username</string>
     <string name="password_hint">Password</string>
-    <string name="title_activity_main2">Main2Activity</string>
+    <string name="loginChild">Child`s login</string>
     <!-- LoginActivity -->
 </resources>

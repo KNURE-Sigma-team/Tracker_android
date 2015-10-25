@@ -11,8 +11,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/username_editText"
         android:hint="@string/username_hint"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="153dp" />
 
     <EditText
         android:layout_width="fill_parent"
@@ -27,6 +29,15 @@
         android:layout_height="wrap_content"
         android:text="@string/login_button"
         android:id="@+id/login_btn"
+        android:layout_marginTop="97dp"
+        android:layout_below="@+id/password_editText"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/loginChild_editText"
+        android:hint="@string/loginChild"
         android:layout_below="@+id/password_editText"
         android:layout_centerHorizontal="true" />
 </RelativeLayout>
