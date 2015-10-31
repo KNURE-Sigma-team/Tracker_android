@@ -14,7 +14,11 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="153dp" />
+        android:layout_marginTop="153dp"
+        android:maxLines="1"
+        android:minLines="1"
+        android:maxLength="32"
+        android:singleLine="true" />
 
     <EditText
         android:layout_width="fill_parent"
@@ -22,7 +26,12 @@
         android:id="@+id/password_editText"
         android:hint="@string/password_hint"
         android:layout_below="@+id/username_editText"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:password="true"
+        android:minLines="1"
+        android:maxLines="1"
+        android:maxLength="32"
+        android:singleLine="true" />
 
     <Button
         android:layout_width="wrap_content"
@@ -39,5 +48,9 @@
         android:id="@+id/loginChild_editText"
         android:hint="@string/loginChild"
         android:layout_below="@+id/password_editText"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:maxLines="1"
+        android:minLines="1"
+        android:maxLength="32"
+        android:singleLine="true" />
 </RelativeLayout>

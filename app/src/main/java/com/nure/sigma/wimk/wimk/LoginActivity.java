@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
@@ -27,7 +28,7 @@ public class LoginActivity extends Activity {
     EditText passwordEditText;
     EditText loginChildEditText;
 
-    String serverURL = "http://178.165.37.203:8080/wimk/mobile_authorization";
+    String serverURL = "http://blockverify.cloudapp.net:8080/wimk//mobile_authorization";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,26 +37,17 @@ public class LoginActivity extends Activity {
         settings = getSharedPreferences("password", 0);
 
         super.onCreate(savedInstanceState);
-
-        //if(settings.getBoolean("isFirstEnter", true)){
-            // Login if first app enter.
             setContentView(R.layout.activity_login);
-
             usernameEditText = (EditText) findViewById(R.id.username_editText);
             passwordEditText = (EditText) findViewById(R.id.password_editText);
             loginChildEditText = (EditText) findViewById(R.id.loginChild_editText);
             Button loginButton = (Button) findViewById(R.id.login_btn);
-
             loginButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     login(usernameEditText.getText().toString(),passwordEditText.getText().toString(),loginChildEditText.getText().toString());
                 }
             });
-        //}
-       // else{
-        //    moveToMainActivity();
-        //}
     }
 
     private void login(String username, String password, String loginChild){
@@ -92,8 +84,11 @@ public class LoginActivity extends Activity {
 
         public LoginAsyncTask(String username, String password, String loginChild) {
             this.username = username;
+            Log.i("SERVICE",username);
             this.password = password;
+            Log.i("SERVICE",password);
             this.loginChild = loginChild;
+            Log.i("SERVICE",loginChild);
         }
 
         @Override
@@ -113,6 +108,7 @@ public class LoginActivity extends Activity {
             id = Util.HttpPostRequest(serverURL, pairs);
             if (id != -1){
             SharedPreferences.Editor e = settings.edit();
+            Log.i("SERVICE",String.valueOf(id));
             e.putInt("idChild", id);
             e.apply();
             return true;

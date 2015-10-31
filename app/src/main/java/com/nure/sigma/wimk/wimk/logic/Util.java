@@ -1,5 +1,10 @@
 package com.nure.sigma.wimk.wimk.logic;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.location.Location;
+import android.os.BatteryManager;
 import android.util.Log;
 import android.util.Pair;
 
@@ -11,11 +16,10 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 
-/**
- * Created by andrew on 17.10.15.
- */
+
 public class Util {
 
     public static final int OK = 0;
@@ -26,13 +30,15 @@ public class Util {
     public static final int OUTPUT_STREAM_FAIL = 105;
     public static final int GET_RESPONSE_FAIL = 106;
 
-    public static int HttpPostRequest(String serverUrl, Collection<Pair<String, String>> pairs){
+    private static final String TAG = "SERVICE";
+
+
+    public static int HttpPostRequest(String serverUrl, Collection<Pair<String, String>> pairs) {
         URL obj = null;
         try {
             obj = new URL(serverUrl);
         } catch (MalformedURLException e) {
             e.printStackTrace();
-            return -1;
         }
 
         HttpURLConnection connection = null;
@@ -40,22 +46,17 @@ public class Util {
             connection = (HttpURLConnection) obj.openConnection();
         } catch (IOException e) {
             e.printStackTrace();
-            return -1;
-        }
-
-        if(connection == null){
         }
 
         try {
             connection.setRequestMethod("POST");
         } catch (java.net.ProtocolException e) {
             e.printStackTrace();
-            return -1;
         }
 
         StringBuilder urlParameters = new StringBuilder();
 
-        for(Pair<String, String> pair : pairs){
+        for (Pair<String, String> pair : pairs) {
             urlParameters.append(pair.first);
             urlParameters.append("=");
             urlParameters.append(pair.second);
@@ -76,7 +77,6 @@ public class Util {
             wr.close();
         } catch (IOException e) {
             e.printStackTrace();
-            return -1;
         }
 
         String response = null;
@@ -87,24 +87,72 @@ public class Util {
             String line = null;
 
             // Read Server Response
-            while((line = reader.readLine()) != null)
-            {
+            while ((line = reader.readLine()) != null) {
                 // Append server response in string
                 sb.append(line + "\n");
             }
-            response = sb.toString();
+            response = String.valueOf(sb.toString());
+            Log.i("SERVICE", response);
+            Log.i("SERVICE", response);
         } catch (IOException e) {
             e.printStackTrace();
-            return -1;
         }
+        int i;
         try {
-            Integer i = Integer.getInteger(response);
+            double d = Double.valueOf(response);
+            i = (int) d;
+            Log.i("SERVICE", String.valueOf(i));
             return i;
-        }
-        catch (NullPointerException e){
+        } catch (Exception e) {
             return -1;
         }
+
+    }
+    //Getting battery level.
+    public static int getBatteryLevel(Context context) {
+        Intent batteryIntent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+        if(level == -1 || scale == -1) {
+            return  50;
+        }
+
+        return (int)(((float) level / (float) scale) * 100.0f);
+    }
+    public static String formatLocation(Location location) {
+        if (location == null)
+            return "";
+        return String.format(
+                "Coordinates: lat = %1$.4f, lon = %2$.4f, time = %3$tF %3$tT",
+                location.getLatitude(), location.getLongitude(), new Date(
+                        location.getTime()));
     }
 
 
+    public static String formatBatteryLevel(float level) {
+        if (level == 0)
+            return "";
+        return String.format("Battery level = %1$.2f",level);
+    }
+
+    public static void logRecord(String record){
+        Log.i(TAG, record);
+    }
+
+    public static boolean isGPSMoreAccuracyLocation(Location locationGPS, Location locationNETWORK, Location locationPASSIVE){
+        try {
+            return locationGPS.getAccuracy() > locationNETWORK.getAccuracy()  && locationGPS.getAccuracy()>locationPASSIVE.getAccuracy();
+        }
+        catch (NullPointerException e){
+            return false;
+        }
+    }
+    public static boolean isNetworkMoreAccuracyLocation(Location locationGPS, Location locationNETWORK, Location locationPASSIVE){
+        try {
+            return locationNETWORK.getAccuracy() > locationGPS.getAccuracy()  && locationNETWORK.getAccuracy()>locationPASSIVE.getAccuracy();
+        }
+        catch (NullPointerException e){
+            return false;
+        }
+    }
 }

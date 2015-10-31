@@ -15,6 +15,7 @@ import android.util.Pair;
 
 import com.nure.sigma.wimk.wimk.logic.Util;
 
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,99 +26,127 @@ public class BackgroundService extends IntentService {
 
     private static final String TAG = "SERVICE";
 
-    private LocationManager locationManager;
-
     private int batteryLevel;
-
+    Location locationPASSIVE = null;
     Location locationGPS = null;
     Location locationNETWORK = null;
     public static int idChild;
-    String serverURL = "http://178.165.37.203:8080/wimk/mobile_get_point";
-
+    String serverURL = "http://blockverify.cloudapp.net:8080/wimk/mobile_get_point";
+    boolean runable;
 
     public BackgroundService() {
         super(BackgroundService.class.getName());
     }
 
     @Override
+    public void onDestroy(){
+        super.onDestroy();
+    }
+    @Override
     protected void onHandleIntent(Intent intent) {
+        SharedPreferences temp = getSharedPreferences("password", 0);
+        runable = temp.getBoolean("runable", false);
+        if (runable) {
+            Log.i(TAG, "Service Started!");
+            LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
 
-        Log.i(TAG, "Service Started!");
-        locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-        try {
-            locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            locationNETWORK = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        } catch (SecurityException se) {
-            logRecord("SECURITY_EXCEPTION");
-        }
-        getBatteryLevel();
-        if (locationGPS == null) {
-            logRecord(formatLocation(locationNETWORK));
-        } else {
-            logRecord(formatLocation(locationGPS));
-        }
-        logRecord(formatBatteryLevel(batteryLevel));
-        logRecord("-------------------------------------------------------------");
+            //Try to get locations from every provider.
+            try {
+                locationNETWORK = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+            } catch (SecurityException se) {
+                Util.logRecord("SECURITY_EXCEPTION");
+            }
+            try {
+                locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            } catch (SecurityException se) {
+                Util.logRecord("SECURITY_EXCEPTION");
+            }
+            try {
+                locationPASSIVE = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+            } catch (SecurityException se) {
+                Util.logRecord("SECURITY_EXCEPTION");
+            }
+            batteryLevel = Util.getBatteryLevel(getApplicationContext());
 
-        SharedPreferences settings = getSharedPreferences("password",0);
-        idChild = settings.getInt("idChild",0);
+            //Logging getting locations and battery level.
+            if (locationGPS != null) {
+                Util.logRecord(Util.formatLocation(locationGPS));
+            } else if (locationNETWORK != null) {
+                Util.logRecord(Util.formatLocation(locationNETWORK));
+            } else if (locationPASSIVE != null) {
+                Util.logRecord(Util.formatLocation(locationPASSIVE));
+            } else {
+                Util.logRecord("All location is null.");
+            }
+            Util.logRecord(Util.formatBatteryLevel(batteryLevel));
+            Util.logRecord("-------------------------------------------------------------");
+
+            //Getting idChild, which setting in LoginActivity.
+            SharedPreferences settings = getSharedPreferences("password", 0);
+            idChild = settings.getInt("idChild", 0);
+            Util.logRecord("idChild = " + idChild);
+
+        //Making request`s parametrs and finding the most accuracy provider.
         List<Pair<String,String>> pairs = new ArrayList<>();
-        pairs.add(new Pair<>("idChild",String.valueOf(idChild)));
-        pairs.add(new Pair<>("longitude",String.valueOf(locationNETWORK.getLongitude())));
-        pairs.add(new Pair<>("latitude",String.valueOf(locationNETWORK.getLatitude())));
+        pairs.add(new Pair<>("idChild", String.valueOf(idChild)));
+        if (isGPSMoreAccuracyLocation()) {
+            pairs.add(new Pair<>("longitude", String.valueOf(locationGPS.getLongitude())));
+            pairs.add(new Pair<>("latitude", String.valueOf(locationGPS.getLatitude())));
+            pairs.add(new Pair<>("time",(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date(locationGPS.getTime()))));
+        }
+        else if (isNetworkMoreAccuracyLocation()) {
+            pairs.add(new Pair<>("longitude", String.valueOf(locationNETWORK.getLongitude())));
+            pairs.add(new Pair<>("latitude", String.valueOf(locationNETWORK.getLatitude())));
+            pairs.add(new Pair<>("time",(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date(locationNETWORK.getTime()))));
+        }
+        else {
+            pairs.add(new Pair<>("longitude", String.valueOf(locationPASSIVE.getLongitude())));
+            pairs.add(new Pair<>("latitude", String.valueOf(locationPASSIVE.getLatitude())));
+            pairs.add(new Pair<>("time",(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date(locationPASSIVE.getTime()))));
+        }
         pairs.add(new Pair<>("battery_level",String.valueOf(batteryLevel)));
-        pairs.add(new Pair<>("time",(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date(locationNETWORK.getTime()))));
+        pairs.add(new Pair<>("point_type","common"));
 
-        Util.HttpPostRequest(serverURL,pairs);
-        //Log.i(TAG, "Service Stopping!");
+        //Post request to server.
+        Util.HttpPostRequest(serverURL, pairs);
+        Log.i(TAG, "Service Stopping!");
 
-        Intent notificationIntent = new Intent(this, BackgroundService.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-        Notification notification = new NotificationCompat.Builder(this)
-                .setContentTitle("WimK")
-                .setContentIntent(pendingIntent)
-                .setOngoing(true)
-                .build();
-        startForeground(300, notification);
+            //Creating notification for starting IntentService in Foreground.
+            Intent notificationIntent = new Intent(this, BackgroundService.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+            Notification notification = new NotificationCompat.Builder(this)
+                    .setContentTitle("WimK")
+                    .setContentIntent(pendingIntent)
+                    .setOngoing(true)
+                    .build();
+            startForeground(300, notification);
+            try {
+                TimeUnit.SECONDS.sleep(30);
+            } catch (Exception e) {
+                Log.i(TAG, e.toString());
+            }
+            getApplicationContext().startService(new Intent(getApplicationContext(), BackgroundService.class));
+        }
+        else{
+            stopSelf();
+        }
+    }
+
+
+    public boolean isGPSMoreAccuracyLocation(){
         try {
-            TimeUnit.SECONDS.sleep(60);
+            return locationGPS.getAccuracy() > locationNETWORK.getAccuracy()  &&  locationGPS.getAccuracy()>locationPASSIVE.getAccuracy();
         }
-        catch (Exception e)
-        {
-            Log.i(TAG, e.toString());
+        catch (NullPointerException e){
+            return false;
         }
-        getApplicationContext().startService(new Intent(getApplicationContext(), BackgroundService.class));
     }
-
-    public void getBatteryLevel() {
-        Intent batteryIntent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-        int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-        if(level == -1 || scale == -1) {
-            batteryLevel = 50;
+    public boolean isNetworkMoreAccuracyLocation(){
+        try {
+            return locationNETWORK.getAccuracy() > locationGPS.getAccuracy()  &&  locationNETWORK.getAccuracy()>locationPASSIVE.getAccuracy();
         }
-
-        batteryLevel =(int)(((float) level / (float) scale) * 100.0f);
+        catch (NullPointerException e){
+            return false;
+        }
     }
-
-    private void logRecord(String record){
-        Log.i(TAG, record);
-    }
-
-
-    private String formatLocation(Location location) {
-        if (location == null)
-            return "";
-        return String.format(
-                "Coordinates: lat = %1$.4f, lon = %2$.4f, time = %3$tF %3$tT",
-                location.getLatitude(), location.getLongitude(), new Date(
-                        location.getTime()));
-    }
-
-    public String formatBatteryLevel(float level) {
-        if (level == 0)
-            return "";
-        return String.format("Battery level = %1$.2f",level);
-    }
-
 }

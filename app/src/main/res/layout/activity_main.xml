@@ -10,16 +10,18 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="75dp"
-        android:text="ИСПОЛНЯЙ"
-        android:id="@+id/perform_btn"
+        android:text="@string/start_button"
+        android:id="@+id/start_button"
+        android:layout_marginTop="69dp"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
-    <TextView
-        android:layout_width="fill_parent"
+    <Button
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="MY FANTASITC LOGS ARE GONNA BE HERE"
-        android:id="@+id/logsTextView"
-        android:gravity="center"
-        android:layout_margin="15dp"
-        android:layout_below="@id/perform_btn"/>
+        android:text="@string/stop_button"
+        android:id="@+id/stop_button"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>
