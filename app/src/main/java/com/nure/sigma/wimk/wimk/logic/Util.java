@@ -22,92 +22,6 @@ import java.util.Map;
 
 public class Util {
 
-    public static final int OK = 0;
-    public static final int BAD_URL = 101;
-    public static final int OPEN_CONNECTION_FAIL = 102;
-    public static final int NULL_CONNECTION = 103;
-    public static final int SET_POST_FAIL = 104;
-    public static final int OUTPUT_STREAM_FAIL = 105;
-    public static final int GET_RESPONSE_FAIL = 106;
-
-    private static final String TAG = "SERVICE";
-
-
-    public static int HttpPostRequest(String serverUrl, Collection<Pair<String, String>> pairs) {
-        URL obj = null;
-        try {
-            obj = new URL(serverUrl);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-        HttpURLConnection connection = null;
-        try {
-            connection = (HttpURLConnection) obj.openConnection();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            connection.setRequestMethod("POST");
-        } catch (java.net.ProtocolException e) {
-            e.printStackTrace();
-        }
-
-        StringBuilder urlParameters = new StringBuilder();
-
-        for (Pair<String, String> pair : pairs) {
-            urlParameters.append(pair.first);
-            urlParameters.append("=");
-            urlParameters.append(pair.second);
-            urlParameters.append("&");
-        }
-
-        // Delete last ampersand
-        urlParameters.delete(urlParameters.length() - 1, urlParameters.length());
-
-        // Send post request
-        connection.setDoOutput(true);
-
-        DataOutputStream wr = null;
-        try {
-            wr = new DataOutputStream(connection.getOutputStream());
-            wr.writeBytes(urlParameters.toString());
-            wr.flush();
-            wr.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        String response = null;
-
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuilder sb = new StringBuilder();
-            String line = null;
-
-            // Read Server Response
-            while ((line = reader.readLine()) != null) {
-                // Append server response in string
-                sb.append(line + "\n");
-            }
-            response = String.valueOf(sb.toString());
-            Log.i("SERVICE", response);
-            Log.i("SERVICE", response);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        int i;
-        try {
-            double d = Double.valueOf(response);
-            i = (int) d;
-            Log.i("SERVICE", String.valueOf(i));
-            return i;
-        } catch (Exception e) {
-            return -1;
-        }
-
-    }
     //Getting battery level.
     public static int getBatteryLevel(Context context) {
         Intent batteryIntent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
@@ -119,15 +33,16 @@ public class Util {
 
         return (int)(((float) level / (float) scale) * 100.0f);
     }
+
     public static String formatLocation(Location location) {
-        if (location == null)
+        if (location == null) {
             return "";
+        }
         return String.format(
                 "Coordinates: lat = %1$.4f, lon = %2$.4f, time = %3$tF %3$tT",
                 location.getLatitude(), location.getLongitude(), new Date(
                         location.getTime()));
     }
-
 
     public static String formatBatteryLevel(float level) {
         if (level == 0)
@@ -135,21 +50,30 @@ public class Util {
         return String.format("Battery level = %1$.2f",level);
     }
 
-    public static void logRecord(String record){
-        Log.i(TAG, record);
+    public static void log(String record){
+        Log.e("andstepko", record);
     }
 
-    public static boolean isGPSMoreAccuracyLocation(Location locationGPS, Location locationNETWORK, Location locationPASSIVE){
+    public static void logRecord(String record){
+        Log.i(Info.getInstance().SERVICE_TAG, record);
+    }
+
+    public static boolean isGPSMoreAccurateLocation(Location locationGPS,
+                                                    Location locationNETWORK, Location locationPASSIVE){
         try {
-            return locationGPS.getAccuracy() > locationNETWORK.getAccuracy()  && locationGPS.getAccuracy()>locationPASSIVE.getAccuracy();
+            return (locationGPS.getAccuracy() > locationNETWORK.getAccuracy())
+                    && (locationGPS.getAccuracy()>locationPASSIVE.getAccuracy());
         }
         catch (NullPointerException e){
             return false;
         }
     }
-    public static boolean isNetworkMoreAccuracyLocation(Location locationGPS, Location locationNETWORK, Location locationPASSIVE){
+
+    public static boolean isNetworkMoreAccurateLocation(Location locationGPS,
+                                                        Location locationNETWORK, Location locationPASSIVE){
         try {
-            return locationNETWORK.getAccuracy() > locationGPS.getAccuracy()  && locationNETWORK.getAccuracy()>locationPASSIVE.getAccuracy();
+            return (locationNETWORK.getAccuracy() > locationGPS.getAccuracy())
+                    && (locationNETWORK.getAccuracy()>locationPASSIVE.getAccuracy());
         }
         catch (NullPointerException e){
             return false;
