@@ -28,15 +28,20 @@ public class LoginActivity extends Activity {
     EditText passwordEditText;
     EditText loginChildEditText;
 
-    String serverURL = "http://blockverify.cloudapp.net:8080/wimk//mobile_authorization";
+    String serverURL = "http://blockverify.cloudapp.net:8080/wimk/mobile_authorization";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        super.onCreate(savedInstanceState);
+
         context = this;
         settings = getSharedPreferences("password", 0);
 
-        super.onCreate(savedInstanceState);
+        if (settings.getBoolean("isFirstEnter", false)){
+            moveToMainActivity();
+        }
+        else {
             setContentView(R.layout.activity_login);
             usernameEditText = (EditText) findViewById(R.id.username_editText);
             passwordEditText = (EditText) findViewById(R.id.password_editText);
@@ -45,9 +50,10 @@ public class LoginActivity extends Activity {
             loginButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    login(usernameEditText.getText().toString(),passwordEditText.getText().toString(),loginChildEditText.getText().toString());
+                    login(usernameEditText.getText().toString(), passwordEditText.getText().toString(), loginChildEditText.getText().toString());
                 }
             });
+        }
     }
 
     private void login(String username, String password, String loginChild){
@@ -66,6 +72,7 @@ public class LoginActivity extends Activity {
         else{
             usernameEditText.setText(EMPTY_STRING);
             passwordEditText.setText(EMPTY_STRING);
+            loginChildEditText.setText(EMPTY_STRING);
         }
     }
 
@@ -121,10 +128,10 @@ public class LoginActivity extends Activity {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             if(aBoolean){
-            Toast.makeText(context,"Login succesful", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context,"Login succesful", Toast.LENGTH_LONG).show();
             }
             else{
-                Toast.makeText(context,"Login unsuccesful", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,"Login unsuccesful. Wrong combination of username, password and child ID.", Toast.LENGTH_LONG).show();
             }
             this.loadingDialog.dismiss();
 

@@ -30,7 +30,7 @@ public class Util {
     public static final int OUTPUT_STREAM_FAIL = 105;
     public static final int GET_RESPONSE_FAIL = 106;
 
-    private static final String TAG = "SERVICE";
+    private static final String TAG = "skornyakov";
 
 
     public static int HttpPostRequest(String serverUrl, Collection<Pair<String, String>> pairs) {
@@ -92,8 +92,7 @@ public class Util {
                 sb.append(line + "\n");
             }
             response = String.valueOf(sb.toString());
-            Log.i("SERVICE", response);
-            Log.i("SERVICE", response);
+            Log.i("SERVICE","Response = " + response);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -101,7 +100,7 @@ public class Util {
         try {
             double d = Double.valueOf(response);
             i = (int) d;
-            Log.i("SERVICE", String.valueOf(i));
+            Log.i("SERVICE","Child ID = " + String.valueOf(i));
             return i;
         } catch (Exception e) {
             return -1;
@@ -141,18 +140,28 @@ public class Util {
 
     public static boolean isGPSMoreAccuracyLocation(Location locationGPS, Location locationNETWORK, Location locationPASSIVE){
         try {
-            return locationGPS.getAccuracy() > locationNETWORK.getAccuracy()  && locationGPS.getAccuracy()>locationPASSIVE.getAccuracy();
+            return locationGPS.getAccuracy() > locationNETWORK.getAccuracy();
         }
         catch (NullPointerException e){
-            return false;
+            if (locationGPS!=null){
+                return true;
+            }
+            else {
+                return false;
+            }
         }
     }
     public static boolean isNetworkMoreAccuracyLocation(Location locationGPS, Location locationNETWORK, Location locationPASSIVE){
         try {
-            return locationNETWORK.getAccuracy() > locationGPS.getAccuracy()  && locationNETWORK.getAccuracy()>locationPASSIVE.getAccuracy();
+            return locationNETWORK.getAccuracy() > locationGPS.getAccuracy();
         }
         catch (NullPointerException e){
-            return false;
+            if (locationNETWORK!=null){
+                return true;
+            }
+            else {
+                return false;
+            }
         }
     }
 }

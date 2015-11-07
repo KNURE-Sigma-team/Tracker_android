@@ -57,9 +57,9 @@ public class SOSButtonWidget extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.sosbutton_widget);
         views.setTextViewText(R.id.appwidget_text, widgetText);
         Intent serviceIntent = new Intent(context, SOSService.class);
-        serviceIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE);
+        serviceIntent.setAction("com.nure.sigma.wimk.wimk.WIDGET_CLICK");
         serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        PendingIntent pIntent = PendingIntent.getActivity(context, appWidgetId,
+        PendingIntent pIntent = PendingIntent.getService(context, appWidgetId,
                 serviceIntent, 0);
         views.setOnClickPendingIntent(R.id.appwidget_text, pIntent);
         appWidgetManager.updateAppWidget(appWidgetId, views);
@@ -68,6 +68,10 @@ public class SOSButtonWidget extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
+        if(intent.getAction().equalsIgnoreCase("com.nure.sigma.wimk.wimk.WIDGET_CLICK")) {
+            Intent i = new Intent(context.getApplicationContext(), SOSService.class);
+            context.getApplicationContext().startService(i);
+        }
     }
 }
 

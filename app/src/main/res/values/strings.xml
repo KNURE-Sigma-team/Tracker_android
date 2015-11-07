@@ -9,6 +9,8 @@
     <string name="stop_button">Stop</string>
     <string name="username_hint">Username</string>
     <string name="password_hint">Password</string>
+    <string name="frequency">Frequency in sec...</string>
+    <string name="SOSButton">SOS</string>
     <string name="loginChild">Child`s login</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="configure">Configure</string>

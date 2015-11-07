@@ -4,11 +4,9 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.BatteryManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.util.Pair;
@@ -24,9 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 public class BackgroundService extends IntentService {
 
-    private static final String TAG = "SERVICE";
+    private static final String TAG = "skornyakov";
 
-    private int batteryLevel;
     Location locationPASSIVE = null;
     Location locationGPS = null;
     Location locationNETWORK = null;
@@ -46,8 +43,10 @@ public class BackgroundService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         SharedPreferences temp = getSharedPreferences("password", 0);
         runable = temp.getBoolean("runable", false);
+        int frequency = temp.getInt("frequency",30);
         if (runable) {
             Log.i(TAG, "Service Started!");
+            Util.logRecord("-------------------------------------------------------------");
             LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
 
             //Try to get locations from every provider.
@@ -66,15 +65,17 @@ public class BackgroundService extends IntentService {
             } catch (SecurityException se) {
                 Util.logRecord("SECURITY_EXCEPTION");
             }
-            batteryLevel = Util.getBatteryLevel(getApplicationContext());
+            int batteryLevel = Util.getBatteryLevel(getApplicationContext());
 
             //Logging getting locations and battery level.
             if (locationGPS != null) {
-                Util.logRecord(Util.formatLocation(locationGPS));
-            } else if (locationNETWORK != null) {
-                Util.logRecord(Util.formatLocation(locationNETWORK));
-            } else if (locationPASSIVE != null) {
-                Util.logRecord(Util.formatLocation(locationPASSIVE));
+                Util.logRecord("GPS location" + Util.formatLocation(locationGPS));
+            }
+            if (locationNETWORK != null) {
+                Util.logRecord("NETWORK location" + Util.formatLocation(locationNETWORK));
+            }
+            if (locationPASSIVE != null) {
+                Util.logRecord("Passive location" + Util.formatLocation(locationPASSIVE));
             } else {
                 Util.logRecord("All location is null.");
             }
@@ -89,17 +90,20 @@ public class BackgroundService extends IntentService {
         //Making request`s parametrs and finding the most accuracy provider.
         List<Pair<String,String>> pairs = new ArrayList<>();
         pairs.add(new Pair<>("idChild", String.valueOf(idChild)));
-        if (isGPSMoreAccuracyLocation()) {
+        if (Util.isGPSMoreAccuracyLocation(locationGPS, locationNETWORK, locationPASSIVE)) {
+            Util.logRecord("Sending GPS provider location.");
             pairs.add(new Pair<>("longitude", String.valueOf(locationGPS.getLongitude())));
             pairs.add(new Pair<>("latitude", String.valueOf(locationGPS.getLatitude())));
             pairs.add(new Pair<>("time",(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date(locationGPS.getTime()))));
         }
-        else if (isNetworkMoreAccuracyLocation()) {
+        else if (Util.isNetworkMoreAccuracyLocation(locationGPS, locationNETWORK, locationPASSIVE)) {
+            Util.logRecord("Sending NETWORK provider location.");
             pairs.add(new Pair<>("longitude", String.valueOf(locationNETWORK.getLongitude())));
             pairs.add(new Pair<>("latitude", String.valueOf(locationNETWORK.getLatitude())));
             pairs.add(new Pair<>("time",(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date(locationNETWORK.getTime()))));
         }
         else {
+            Util.logRecord("Sending passive provider location.");
             pairs.add(new Pair<>("longitude", String.valueOf(locationPASSIVE.getLongitude())));
             pairs.add(new Pair<>("latitude", String.valueOf(locationPASSIVE.getLatitude())));
             pairs.add(new Pair<>("time",(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date(locationPASSIVE.getTime()))));
@@ -110,6 +114,8 @@ public class BackgroundService extends IntentService {
         //Post request to server.
         Util.HttpPostRequest(serverURL, pairs);
         Log.i(TAG, "Service Stopping!");
+        Util.logRecord("-------------------------------------------------------------");
+
 
             //Creating notification for starting IntentService in Foreground.
             Intent notificationIntent = new Intent(this, BackgroundService.class);
@@ -121,7 +127,7 @@ public class BackgroundService extends IntentService {
                     .build();
             startForeground(300, notification);
             try {
-                TimeUnit.SECONDS.sleep(30);
+                TimeUnit.SECONDS.sleep(frequency);
             } catch (Exception e) {
                 Log.i(TAG, e.toString());
             }
@@ -129,24 +135,6 @@ public class BackgroundService extends IntentService {
         }
         else{
             stopSelf();
-        }
-    }
-
-
-    public boolean isGPSMoreAccuracyLocation(){
-        try {
-            return locationGPS.getAccuracy() > locationNETWORK.getAccuracy()  &&  locationGPS.getAccuracy()>locationPASSIVE.getAccuracy();
-        }
-        catch (NullPointerException e){
-            return false;
-        }
-    }
-    public boolean isNetworkMoreAccuracyLocation(){
-        try {
-            return locationNETWORK.getAccuracy() > locationGPS.getAccuracy()  &&  locationNETWORK.getAccuracy()>locationPASSIVE.getAccuracy();
-        }
-        catch (NullPointerException e){
-            return false;
         }
     }
 }
