@@ -1,4 +1,5 @@
 package com.nure.sigma.wimk.wimk;
+
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -32,7 +33,7 @@ public class BackgroundService extends IntentService {
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
     }
 
@@ -41,17 +42,17 @@ public class BackgroundService extends IntentService {
 
         SharedPreferences temp = getSharedPreferences(Info.PASSWORD, 0);
         running = temp.getBoolean(Info.RUNNING, false);
-            int frequency = temp.getInt("frequency",30);
+        int frequency = temp.getInt("frequency", 30);
 
-            if (running) {
+        if (running) {
             LocationSender locationSender = new LocationSender(Info.COMMON, this);
             MyHttpResponse myHttpResponse = locationSender.sendLocation();
-               /* if (myHttpResponse.getErrorCode() == MyHttpResponse.OK){
-                    Util.fillFileList(this);
-                    if (Info.FILE_LIST != null && !Info.FILE_LIST.isEmpty())
-                        startService(new Intent(getApplicationContext(), ListSenderService.class));
-                }
-*/
+            if (myHttpResponse.getErrorCode() == MyHttpResponse.OK) {
+                Util.fillFileList(this);
+                if (Info.FILE_LIST != null && !Info.FILE_LIST.isEmpty())
+                    startService(new Intent(getApplicationContext(), ListSenderService.class));
+            }
+
             Log.i(Info.SERVICE_TAG, "Service Stopping!");
 
             //Creating notification for starting IntentService in Foreground.
@@ -69,8 +70,7 @@ public class BackgroundService extends IntentService {
                 Log.i(Info.SERVICE_TAG, e.toString());
             }
             getApplicationContext().startService(new Intent(getApplicationContext(), BackgroundService.class));
-        }
-        else{
+        } else {
             // If not running.
             stopSelf();
         }

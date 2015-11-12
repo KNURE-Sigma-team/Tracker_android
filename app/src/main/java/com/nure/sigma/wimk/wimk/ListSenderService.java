@@ -28,8 +28,8 @@ public class ListSenderService extends IntentService {
         super(ListSenderService.class.getName());
     }
 
-        @Override
-        public void onDestroy () {
+    @Override
+    public void onDestroy() {
         super.onDestroy();
     }
 
@@ -38,9 +38,9 @@ public class ListSenderService extends IntentService {
         SharedPreferences settings = getApplicationContext().getSharedPreferences(Info.PASSWORD, 0);
         int idChild = settings.getInt(Info.ID_CHILD, 0);
         Util.logRecord(Info.ID_CHILD + " = " + idChild);
-      //  Util.fillFileList(this);
-        List<Pair<String,String>> pairs = new ArrayList<>();
-        for (Pair<Location,String> pair : Info.FILE_LIST) {
+        //  Util.fillFileList(this);
+        List<Pair<String, String>> pairs = new ArrayList<>();
+        for (Pair<Location, String> pair : Info.FILE_LIST) {
             pairs.add(new Pair<>(Info.ID_CHILD, String.valueOf(idChild)));
 
             pairs.add(new Pair<>(Info.LONGITUDE, String.valueOf(pair.first.getLongitude())));

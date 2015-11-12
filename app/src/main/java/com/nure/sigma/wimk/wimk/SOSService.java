@@ -10,7 +10,6 @@ import com.nure.sigma.wimk.wimk.logic.LocationSender;
 import com.nure.sigma.wimk.wimk.logic.MyHttpResponse;
 
 
-
 public class SOSService extends IntentService {
     boolean running;
 
@@ -19,15 +18,15 @@ public class SOSService extends IntentService {
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-            Log.i(Info.SERVICE_TAG, "Service Starting!");
-            LocationSender locationSender = new LocationSender(Info.SOS,this );
-            MyHttpResponse myHttpResponse = locationSender.sendLocation();
-            Log.i(Info.SERVICE_TAG, "Service Stopping!");
+        Log.i(Info.SERVICE_TAG, "Service Starting!");
+        LocationSender locationSender = new LocationSender(Info.SOS, this);
+        MyHttpResponse myHttpResponse = locationSender.sendLocation();
+        Log.i(Info.SERVICE_TAG, "Service Stopping!");
     }
 }

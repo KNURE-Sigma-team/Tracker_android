@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
     //FIXME remove after debug
     private LocationManager locationManager;
 
-    private void gainLogSendCoordinates(){
+    private void gainLogSendCoordinates() {
         // Must happen in background every N seconds.
 
         // Means enabling in settings.
@@ -114,22 +114,21 @@ public class MainActivity extends AppCompatActivity {
         logRecord("GPS==>" + gpsEnabled);
         logRecord("NETWORK==>" + networkEnabled);
 
-        if(gpsEnabled || networkEnabled) {
+        if (gpsEnabled || networkEnabled) {
             try {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                         0, 1, locationListener);
-           locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                         0, 1, locationListener);
             } catch (SecurityException se) {
                 logRecord("SECURITY_EXCEPTION");
             }
-        }
-        else{
+        } else {
             // Report switching the geo-location off in settings.
         }
     }
 
-    private void logRecord(String record){
+    private void logRecord(String record) {
         logTextView.setText(logTextView.getText().toString() + "\n" + record);
     }
 
@@ -154,23 +153,20 @@ public class MainActivity extends AppCompatActivity {
                 // Geo-location starts blinking, if it's
                 locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 locationNETWORK = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            }
-            catch (SecurityException se){
+            } catch (SecurityException se) {
                 logRecord("SECURITY_EXCEPTION");
             }
 
-            if(locationGPS == null){
+            if (locationGPS == null) {
                 // GPS is enabled in settings, but unable to get location.
                 logRecord("locationGPS == null");
-            }
-            else{
+            } else {
                 logRecord(formatLocation(locationGPS));
             }
-            if(locationNETWORK == null){
+            if (locationNETWORK == null) {
                 // NETWORK location is enabled in settings, but unable to get location.
                 logRecord("locationNETWORK == null");
-            }
-            else{
+            } else {
                 logRecord(formatLocation(locationNETWORK));
             }
             logRecord("-------------------------------------------------------------");
@@ -178,17 +174,15 @@ public class MainActivity extends AppCompatActivity {
             // Shut down!
             try {
                 locationManager.removeUpdates(locationListener);
-            }
-            catch (SecurityException se){
+            } catch (SecurityException se) {
                 logRecord("SECURITY_EXCEPTION");
             }
 
             // Choose which provider data to sendLocation
             Location locationToSend = null;
-            if(locationGPS != null){
+            if (locationGPS != null) {
                 locationToSend = locationGPS;
-            }
-            else if(locationNETWORK != null){
+            } else if (locationNETWORK != null) {
                 locationToSend = locationNETWORK;
             }
 
@@ -217,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
-    private class SendLocationTask extends AsyncTask<Void, Void, Boolean>{
+    private class SendLocationTask extends AsyncTask<Void, Void, Boolean> {
 
         private Location location;
         private int batteryLevel;
@@ -240,21 +234,21 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            if(location == null){
+            if (location == null) {
                 return false;
             }
 
-            if(idChild == -1){
+            if (idChild == -1) {
                 return false;
             }
 
             //Making request`s parameters and finding the most accurate provider.
-            List<Pair<String,String>> pairs = new ArrayList<>();
+            List<Pair<String, String>> pairs = new ArrayList<>();
             pairs.add(new Pair<>(info.ID_CHILD, String.valueOf(idChild)));
             // Location data.
             pairs.add(new Pair<>(info.LONGITUDE, String.valueOf(location.getLongitude())));
             pairs.add(new Pair<>(info.LATITUDE, String.valueOf(location.getLatitude())));
-            pairs.add(new Pair<>(info.TIME,(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
+            pairs.add(new Pair<>(info.TIME, (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
                     .format(new Date(location.getTime()))));
             // Non-location data.
             pairs.add(new Pair<>(info.BATTERY_LEVEL, String.valueOf(batteryLevel)));
@@ -266,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
                     Info.getInstance().WAIT_TIME);
 
             response = myHttpResponse.getResponse();
-            if(myHttpResponse.getErrorCode() != MyHttpResponse.OK){
+            if (myHttpResponse.getErrorCode() != MyHttpResponse.OK) {
                 return false;
             }
 
@@ -277,10 +271,9 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Boolean aBoolean) {
             logRecord("response==>" + response);
 
-            if(aBoolean){
+            if (aBoolean) {
                 logRecord("Data was sent.");
-            }
-            else{
+            } else {
                 logRecord("Error sending data!");
             }
         }

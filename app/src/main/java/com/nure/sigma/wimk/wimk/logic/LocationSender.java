@@ -14,9 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by andstepko on 07.11.15.
- */
+
 public class LocationSender {
 
     public static final String MOBILE_GET_POINT_URL = Info.getInstance().SERVER_URL + "mobile_get_point";
@@ -37,7 +35,7 @@ public class LocationSender {
         this.context = context;
     }
 
-    public MyHttpResponse sendLocation(){
+    public MyHttpResponse sendLocation() {
         Log.i(SERVICE_TAG, "Service Started!");
         LocationManager locationManager = (LocationManager) context
                 .getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
@@ -61,14 +59,11 @@ public class LocationSender {
 
         if (locationGPS != null) {
             Util.logRecord(Util.formatLocation(locationGPS));
-        }
-        else if (locationNETWORK != null){
+        } else if (locationNETWORK != null) {
             Util.logRecord(Util.formatLocation(locationNETWORK));
-        }
-        else if (locationPASSIVE != null){
+        } else if (locationPASSIVE != null) {
             Util.logRecord(Util.formatLocation(locationPASSIVE));
-        }
-        else {
+        } else {
             Util.logRecord("All locations are null.");
         }
         Util.logRecord(Util.formatBatteryLevel(batteryLevel));
@@ -78,21 +73,21 @@ public class LocationSender {
         idChild = settings.getInt(Info.ID_CHILD, 0);
         Util.logRecord(Info.ID_CHILD + " = " + idChild);
 
-        List<Pair<String,String>> pairs = new ArrayList<>();
+        List<Pair<String, String>> pairs = new ArrayList<>();
         pairs.add(new Pair<>(Info.ID_CHILD, String.valueOf(idChild)));
         // Choose, which location to sendLocation.
         Location resultLocation;
         if (Util.isGPSMoreAccurateLocation(locationGPS, locationNETWORK, locationPASSIVE)) {
             resultLocation = locationGPS;
-        }else if (Util.isNetworkMoreAccurateLocation(locationGPS, locationNETWORK, locationPASSIVE)) {
+        } else if (Util.isNetworkMoreAccurateLocation(locationGPS, locationNETWORK, locationPASSIVE)) {
             resultLocation = locationNETWORK;
-        } else{
+        } else {
             resultLocation = locationPASSIVE;
         }
 
         pairs.add(new Pair<>(Info.LONGITUDE, String.valueOf(resultLocation.getLongitude())));
         pairs.add(new Pair<>(Info.LATITUDE, String.valueOf(resultLocation.getLatitude())));
-        pairs.add(new Pair<>(Info.TIME,(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
+        pairs.add(new Pair<>(Info.TIME, (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
                 .format(new Date(resultLocation.getTime()))));
 
         pairs.add(new Pair<>(Info.BATTERY_LEVEL, String.valueOf(batteryLevel)));
@@ -100,8 +95,8 @@ public class LocationSender {
         //Sending
         DataSender dataSender = new DataSender();
         MyHttpResponse myHttpResponse = dataSender.HttpPostQuery(MOBILE_GET_POINT_URL, pairs, Info.WAIT_TIME);
-        if (myHttpResponse.getErrorCode()!=MyHttpResponse.OK){
-            Util.addToFileList(new Pair<Location, String>(resultLocation,String.valueOf(batteryLevel)),context);
+        if (myHttpResponse.getErrorCode() != MyHttpResponse.OK) {
+            Util.addToFileList(new Pair<Location, String>(resultLocation, String.valueOf(batteryLevel)), context);
         }
         return myHttpResponse;
     }

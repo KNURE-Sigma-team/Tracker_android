@@ -68,7 +68,7 @@ public class SOSButtonWidget extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
-        if(intent.getAction().equalsIgnoreCase("com.nure.sigma.wimk.wimk.WIDGET_CLICK")) {
+        if (intent.getAction().equalsIgnoreCase("com.nure.sigma.wimk.wimk.WIDGET_CLICK")) {
             Intent i = new Intent(context.getApplicationContext(), SOSService.class);
             context.getApplicationContext().startService(i);
         }

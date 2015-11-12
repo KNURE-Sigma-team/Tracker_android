@@ -44,10 +44,9 @@ public class LoginActivity extends Activity {
         context = this;
         settings = getSharedPreferences("password", 0);
 
-        if (settings.getBoolean("isFirstEnter", false)){
+        if (settings.getBoolean("isFirstEnter", false)) {
             moveToMainActivity();
-        }
-        else {
+        } else {
             setContentView(R.layout.activity_login);
             usernameEditText = (EditText) findViewById(R.id.username_edit_text);
             passwordEditText = (EditText) findViewById(R.id.password_editText);
@@ -65,33 +64,32 @@ public class LoginActivity extends Activity {
         }
     }
 
-    private void login(String username, String password, String childName){
+    private void login(String username, String password, String childName) {
         LoginAsyncTask loginAsyncTask = new LoginAsyncTask(username, password, childName);
         loginAsyncTask.execute();
     }
 
-    private void afterLoginBehaviour(boolean loginSuccess){
-        if(loginSuccess){
+    private void afterLoginBehaviour(boolean loginSuccess) {
+        if (loginSuccess) {
             SharedPreferences.Editor e = settings.edit();
             e.putBoolean("isFirstEnter", false);
             e.apply();
             //TODO save username and password to preferences somehow
             moveToMainActivity();
-        }
-        else{
+        } else {
             usernameEditText.setText(info.EMPTY_STRING);
             passwordEditText.setText(info.EMPTY_STRING);
             childNameEditText.setText(info.EMPTY_STRING);
         }
     }
 
-    private void moveToMainActivity(){
+    private void moveToMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 
 
-    private class LoginAsyncTask extends AsyncTask<Void, Void, Boolean>{
+    private class LoginAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
         private String username;
         private String password;
@@ -116,9 +114,9 @@ public class LoginActivity extends Activity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            List<Pair<String,String>> pairs = new ArrayList<>();
-            pairs.add(new Pair<String, String>("loginParent",username));
-            pairs.add(new Pair<String, String>("loginChild",loginChild));
+            List<Pair<String, String>> pairs = new ArrayList<>();
+            pairs.add(new Pair<String, String>("loginParent", username));
+            pairs.add(new Pair<String, String>("loginChild", loginChild));
             pairs.add(new Pair<String, String>("password", password));
 
             int id;
@@ -128,7 +126,7 @@ public class LoginActivity extends Activity {
 
             Log.e("andstepko", "errorCode from Server==>" + errorCode);
 
-            if (errorCode == MyHttpResponse.OK){
+            if (errorCode == MyHttpResponse.OK) {
 
                 Log.e("andstepko", "login response==>" + myHttpResponse.getResponse());
 
@@ -142,30 +140,27 @@ public class LoginActivity extends Activity {
 
                 Log.i("SERVICE", "got errorCode==>" + String.valueOf(myHttpResponse.getErrorCode()));
 
-                if(i != -1) {
+                if (i != -1) {
                     SharedPreferences.Editor e = settings.edit();
                     e.putInt("idChild", i);
                     e.apply();
                     return true;
-                }
-                else{
+                } else {
                     // Server returned error.
                     return false;
                 }
-            }
-            else{
+            } else {
                 return false;
             }
         }
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
-            if(aBoolean){
+            if (aBoolean) {
 
-                Toast.makeText(context,"Login successful", Toast.LENGTH_SHORT).show();
-            }
-            else{
-                Toast.makeText(context,"Login unsuccessful", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "Login unsuccessful", Toast.LENGTH_SHORT).show();
             }
 
             this.loadingDialog.dismiss();
