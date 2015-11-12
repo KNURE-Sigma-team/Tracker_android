@@ -9,22 +9,49 @@
     <EditText
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/username_editText"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:id="@+id/username_edit_text"
+        android:hint="@string/email_hint"
+        android:inputType="textEmailAddress"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="153dp"
+        android:maxLines="1"
+        android:minLines="1"
+        android:maxLength="32"
+        android:singleLine="true" />
 
     <EditText
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/password_editText"
-        android:layout_below="@+id/username_editText"
-        android:layout_centerHorizontal="true" />
+        android:hint="@string/password_hint"
+        android:layout_below="@+id/username_edit_text"
+        android:layout_centerHorizontal="true"
+        android:password="true"
+        android:minLines="1"
+        android:maxLines="1"
+        android:maxLength="32"
+        android:singleLine="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/login"
+        android:text="@string/login_button"
         android:id="@+id/login_btn"
+        android:layout_marginTop="97dp"
         android:layout_below="@+id/password_editText"
         android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/loginChild_editText"
+        android:hint="@string/child_name"
+        android:layout_below="@+id/password_editText"
+        android:layout_centerHorizontal="true"
+        android:maxLines="1"
+        android:minLines="1"
+        android:maxLength="32"
+        android:singleLine="true" />
 </RelativeLayout>
