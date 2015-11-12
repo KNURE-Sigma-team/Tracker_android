@@ -9,6 +9,7 @@
         android:textColor="#ffffff" android:textSize="24sp" android:textStyle="bold|italic"
         android:layout_margin="8dp" android:contentDescription="@string/appwidget_text"
         android:background="#cc0029"
-        android:autoText="false" />
+        android:autoText="true"
+        android:allowUndo="true" />
 
 </RelativeLayout>
