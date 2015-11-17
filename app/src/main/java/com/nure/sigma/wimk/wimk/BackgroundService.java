@@ -12,6 +12,7 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.util.Pair;
 
+import com.nure.sigma.wimk.wimk.logic.DataSender;
 import com.nure.sigma.wimk.wimk.logic.Info;
 import com.nure.sigma.wimk.wimk.logic.LocationSender;
 import com.nure.sigma.wimk.wimk.logic.MyHttpResponse;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class BackgroundService extends IntentService {
+
 
     boolean running;
 
@@ -42,16 +44,40 @@ public class BackgroundService extends IntentService {
 
         SharedPreferences temp = getSharedPreferences(Info.PASSWORD, 0);
         running = temp.getBoolean(Info.RUNNING, false);
-        int frequency = temp.getInt("frequency", 30);
-
+        int frequency = temp.getInt(Info.FREQUENCY, 30);
+        int idChild = temp.getInt(Info.ID_CHILD, 0);
         if (running) {
             LocationSender locationSender = new LocationSender(Info.COMMON, this);
             MyHttpResponse myHttpResponse = locationSender.sendLocation();
-            if (myHttpResponse.getErrorCode() == MyHttpResponse.OK) {
-                Util.fillFileList(this);
-                if (Info.FILE_LIST != null && !Info.FILE_LIST.isEmpty())
-                    startService(new Intent(getApplicationContext(), ListSenderService.class));
-            }
+            Util.logRecord(String.valueOf(myHttpResponse.getErrorCode()));
+//            Util.fillFileList(this);
+//            ArrayList<Pair<Location, String>> tempList = new ArrayList<>();
+            /*if (Info.FILE_LIST != null && !Info.FILE_LIST.isEmpty() && myHttpResponse.getErrorCode() == MyHttpResponse.OK) {
+                Util.logRecord("Sending failed locations");
+                Util.logRecord(Info.ID_CHILD + " = " + idChild);
+                for (Pair<Location, String> pair : Info.FILE_LIST) {
+
+                    List<Pair<String, String>> pairs = new ArrayList<>();
+
+                    pairs.add(new Pair<>(Info.ID_CHILD, String.valueOf(idChild)));
+                    pairs.add(new Pair<>(Info.LONGITUDE, String.valueOf(pair.first.getLongitude())));
+                    pairs.add(new Pair<>(Info.LATITUDE, String.valueOf(pair.first.getLatitude())));
+                    pairs.add(new Pair<>(Info.TIME, (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
+                            .format(new Date(pair.first.getTime()))));
+                    pairs.add(new Pair<>(Info.BATTERY_LEVEL, pair.second));
+                    pairs.add(new Pair<>(Info.POINT_TYPE, Info.COMMON));
+                    DataSender dataSender = new DataSender();
+                    myHttpResponse = dataSender.HttpPostQuery(MOBILE_GET_POINT_URL, pairs, Info.WAIT_TIME);
+                    if (myHttpResponse.getErrorCode() != MyHttpResponse.OK) {
+                        tempList.add(new Pair<Location, String>(pair.first, pair.second));
+                    }
+                }
+                Info.FILE_LIST = new ArrayList<>();
+                for (Pair<Location, String> pair : tempList) {
+                    Util.addToFileList(pair, getApplicationContext());
+                }
+                Util.logRecord("Stop sending failed locations");
+            }*/
 
             Log.i(Info.SERVICE_TAG, "Service Stopping!");
 
@@ -62,6 +88,8 @@ public class BackgroundService extends IntentService {
                     .setContentTitle("WimK")
                     .setContentIntent(pendingIntent)
                     .setOngoing(true)
+                    .setContentText("Where is my Kid?")
+                    .setSubText("Some text")
                     .build();
             startForeground(300, notification);
             try {

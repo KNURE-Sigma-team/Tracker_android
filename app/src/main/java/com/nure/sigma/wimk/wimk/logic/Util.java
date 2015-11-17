@@ -14,11 +14,14 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -30,29 +33,36 @@ public class Util {
 
     public static void fillFileList(Context context) {
         ObjectInputStream in = null;
-        Info.FILE_LIST = new ArrayList<>();
         try {
             JSONParser parser = new JSONParser();
 
             try {
-
-                Object obj = parser.parse(new FileReader(
-                        context.getFilesDir().getPath() + Info.LOCATIONS_FILE));
-
-                JSONObject jsonObject = (JSONObject) obj;
-                JSONArray array = (JSONArray) jsonObject.get("Locations list");
-                Iterator<JSONObject> iterator = array.iterator();
-                while (iterator.hasNext()) {
-                    JSONObject object = iterator.next();
-                    Location location = new Location(LocationManager.PASSIVE_PROVIDER);
-                    location.setLatitude(Double.valueOf(object.get("latitude").toString()));
-                    location.setTime(Long.valueOf(object.get("time").toString()));
-                    location.setLongitude(Double.valueOf(object.get("longitude").toString()));
-                    Info.FILE_LIST.add(new Pair<Location, String>(location, object.get("battery_level").toString()));
-                    array.remove(object);
+                File file = new File(context.getFilesDir().getPath() + Info.LOCATIONS_FILE);
+                if (!file.exists()) {
+                    file.createNewFile();
                 }
-                System.out.println("Successfully Read JSON Object from File...");
-                System.out.println("\nJSON Object: " + jsonObject);
+                if (file.length() > 0) {
+                    Object obj = parser.parse(new BufferedReader(new InputStreamReader(new FileInputStream(file))));
+                    JSONObject jsonObject = (JSONObject) obj;
+                    System.out.println("Successfully Read JSON Object from File...");
+                    System.out.println("\nJSON Object: " + jsonObject);
+                    JSONArray array = (JSONArray) jsonObject.get("Locations list");
+                    Iterator<JSONObject> iterator = array.iterator();
+                    while (iterator.hasNext()) {
+                        JSONObject object = iterator.next();
+                        Location location = new Location(LocationManager.PASSIVE_PROVIDER);
+                        location.setLatitude(Double.valueOf(object.get(Info.LATITUDE).toString()));
+                        location.setTime(Long.valueOf(object.get(Info.TIME).toString()));
+                        location.setLongitude(Double.valueOf(object.get(Info.LONGITUDE).toString()));
+                        Info.FILE_LIST.add(new Pair<Location, String>(location, object.get(Info.BATTERY_LEVEL).toString()));
+                    }
+                    jsonObject.clear();
+                    array = new JSONArray();
+                    jsonObject.put("Locations list", array);
+                    FileWriter fileWriter = new FileWriter(file);
+                    fileWriter.write(jsonObject.toJSONString());
+                    fileWriter.close();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -72,10 +82,10 @@ public class Util {
             JSONArray locations = new JSONArray();
             for (Pair<Location, String> pair : Info.FILE_LIST) {
                 JSONObject location = new JSONObject();
-                location.put("latitude", pair.first.getLatitude());
-                location.put("longitude", pair.first.getLongitude());
-                location.put("time", pair.first.getTime());
-                location.put("battery_level", pair.second);
+                location.put(Info.LATITUDE, pair.first.getLatitude());
+                location.put(Info.LONGITUDE, pair.first.getLongitude());
+                location.put(Info.TIME, pair.first.getTime());
+                location.put(Info.BATTERY_LEVEL, pair.second);
                 locations.add(location);
             }
             obj.put("Locations list", locations);
@@ -83,13 +93,13 @@ public class Util {
             fileWriter.write(obj.toJSONString());
             System.out.println("Successfully Copied JSON Object to File...");
             System.out.println("\nJSON Object: " + obj);
+            fileWriter.close();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
     public static void addToFileList(Pair<Location, String> pair, Context context) {
-        fillFileList(context);
         Info.FILE_LIST.add(pair);
         writeListToFile(context);
     }

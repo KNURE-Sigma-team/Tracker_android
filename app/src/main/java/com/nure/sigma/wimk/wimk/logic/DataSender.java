@@ -86,7 +86,7 @@ public class DataSender {
                     sb.append(line + "\n");
                 }
                 response = String.valueOf(sb.toString());
-
+                Util.logRecord("response = " + response);
                 if (response == null) {
                     return new MyHttpResponse(MyHttpResponse.RESPONSE_NULL, null);
                 }

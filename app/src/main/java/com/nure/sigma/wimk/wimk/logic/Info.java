@@ -17,6 +17,7 @@ public class Info {
     public static final String TIME = "time";
     public static final String BATTERY_LEVEL = "battery_level";
     public static final String POINT_TYPE = "point_type";
+    public static final String LOCATIONS_LIST = "Locations list";
 
     public static final String COMMON = "common";
     public static final String SOS = "sos";
@@ -25,9 +26,9 @@ public class Info {
     //Settings
     public static final String PASSWORD = "password";
     public static final String ID_CHILD = "idChild";
-
+    public static final String FREQUENCY = "frequency";
     //Locations file
-    public static final String LOCATIONS_FILE = "failed.json";
+    public static final String LOCATIONS_FILE = "/failed.json";
 
     public static final int WAIT_TIME = 2000;
 
