@@ -30,9 +30,6 @@ public class SOSButtonWidget extends AppWidgetProvider {
     public void onDeleted(Context context, int[] appWidgetIds) {
         final int N = appWidgetIds.length;
         Log.d(LOG_TAG, "onDeleted " + Arrays.toString(appWidgetIds));
-        for (int i = 0; i < N; i++) {
-            SOSButtonWidgetConfigureActivity.deleteTitlePref(context, appWidgetIds[i]);
-        }
     }
 
     @Override
@@ -54,9 +51,7 @@ public class SOSButtonWidget extends AppWidgetProvider {
                                 int appWidgetId) {
         Log.d(LOG_TAG, "updateWidget " + appWidgetId);
 
-        CharSequence widgetText = SOSButtonWidgetConfigureActivity.loadTitlePref(context, appWidgetId);
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.sosbutton_widget);
-        views.setTextViewText(R.id.appwidget_text, widgetText);
         Intent serviceIntent = new Intent(context, SOSService.class);
         serviceIntent.setAction("com.nure.sigma.wimk.wimk.WIDGET_CLICK");
         serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);

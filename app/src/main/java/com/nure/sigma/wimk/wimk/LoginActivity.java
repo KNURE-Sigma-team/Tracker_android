@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.nure.sigma.wimk.wimk.logic.Child;
 import com.nure.sigma.wimk.wimk.logic.DataSender;
 import com.nure.sigma.wimk.wimk.logic.Info;
 import com.nure.sigma.wimk.wimk.logic.MyHttpResponse;
@@ -32,77 +33,94 @@ public class LoginActivity extends Activity {
     private Context context;
     EditText usernameEditText;
     EditText passwordEditText;
-    EditText childNameEditText;
 
-    String serverURL = "http://blockverify.cloudapp.net:8080/wimk/mobile_authorization";
-
+    //String serverURL = "http://blockverify.cloudapp.net:8080/wimk/mobile_authorization";
 
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 
         context = this;
-        settings = getSharedPreferences("password", 0);
+        settings = getSharedPreferences(Info.PASSWORD, 0);
 
-        if (settings.getBoolean("isFirstEnter", false)) {
-            moveToMainActivity();
-        } else {
-            setContentView(R.layout.activity_login);
-            usernameEditText = (EditText) findViewById(R.id.username_edit_text);
-            passwordEditText = (EditText) findViewById(R.id.password_editText);
-            childNameEditText = (EditText) findViewById(R.id.loginChild_editText);
-            Button loginButton = (Button) findViewById(R.id.login_btn);
+        setContentView(R.layout.activity_login);
+        usernameEditText = (EditText) findViewById(R.id.username_edit_text);
+        passwordEditText = (EditText) findViewById(R.id.password_editText);
+        //childNameEditText = (EditText) findViewById(R.id.loginChild_editText);
+        Button loginButton = (Button) findViewById(R.id.login_btn);
 
-            loginButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    login(usernameEditText.getText().toString(), passwordEditText.getText().toString(),
-                            childNameEditText.getText().toString());
-                }
-            });
-        }
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                login(usernameEditText.getText().toString(), passwordEditText.getText().toString());
+            }
+        });
     }
 
-    private void login(String username, String password, String childName) {
-        LoginAsyncTask loginAsyncTask = new LoginAsyncTask(username, password, childName);
+    private void login(String username, String password) {
+        LoginAsyncTask loginAsyncTask = new LoginAsyncTask(username, password);
         loginAsyncTask.execute();
     }
 
-    private void afterLoginBehaviour(boolean loginSuccess) {
-        if (loginSuccess) {
-            SharedPreferences.Editor e = settings.edit();
-            e.putBoolean("isFirstEnter", false);
-            e.apply();
-            //TODO save username and password to preferences somehow
-            moveToMainActivity();
-        } else {
-            usernameEditText.setText(info.EMPTY_STRING);
+    private void afterFailedLogin() {
+            //usernameEditText.setText(info.EMPTY_STRING);
             passwordEditText.setText(info.EMPTY_STRING);
-            childNameEditText.setText(info.EMPTY_STRING);
+    }
+
+    private void afterSuccessfulLogin(String serverResponse){
+        SharedPreferences.Editor e = settings.edit();
+        e.putBoolean(Info.IS_FIRST_ENTER, false);
+        e.apply();
+        //TODO save username and password to preferences somehow
+
+        List<Child> children = Child.parseChildrenList(serverResponse);
+        if(children.size() == 0){
+            Toast.makeText(this, getString(R.string.no_children_error), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(children.size() == 1){
+            moveToMainActivity(children.get(0));
+        }
+        else{
+            // Have many children
+            moveToChooseChildActivity(children);
         }
     }
 
-    private void moveToMainActivity() {
+    private void moveToMainActivity(Child child) {
+        SharedPreferences.Editor e = settings.edit();
+        e.putInt(Info.ID_CHILD, child.getId());
+        e.commit();
+
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 
+    private void moveToChooseChildActivity(List<Child> childList) {
+        Info.getInstance().setChildList(childList);
+
+        Intent intent = new Intent(this, ChooseChildActivity.class);
+        startActivity(intent);
+    }
 
     private class LoginAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
+        public static final String SERVER_ERROR_RESPONSE = "Exception\n";
+
+        private String response;
+
         private String username;
         private String password;
-        private String loginChild;
+
         private ProgressDialog loadingDialog;
 
-        public LoginAsyncTask(String username, String password, String loginChild) {
+        //public LoginAsyncTask(String username, String password, String loginChild) {
+        public LoginAsyncTask(String username, String password) {
             this.username = username;
             Log.i("SERVICE", "username==>" + username);
             this.password = password;
             Log.i("SERVICE", "password==>" + password);
-            this.loginChild = loginChild;
-            Log.i("SERVICE", "loginChild==>" + loginChild);
+//            this.loginChild = loginChild;
+//            Log.i("SERVICE", "loginChild==>" + loginChild);
         }
 
         @Override
@@ -116,7 +134,7 @@ public class LoginActivity extends Activity {
         protected Boolean doInBackground(Void... params) {
             List<Pair<String, String>> pairs = new ArrayList<>();
             pairs.add(new Pair<String, String>("loginParent", username));
-            pairs.add(new Pair<String, String>("loginChild", loginChild));
+            //pairs.add(new Pair<String, String>("loginChild", loginChild));
             pairs.add(new Pair<String, String>("password", password));
 
             int id;
@@ -128,27 +146,15 @@ public class LoginActivity extends Activity {
 
             if (errorCode == MyHttpResponse.OK) {
 
-                Log.e("andstepko", "login response==>" + myHttpResponse.getResponse());
+                response = myHttpResponse.getResponse();
 
-                int i;
-                try {
-                    double d = Double.valueOf(myHttpResponse.getResponse());
-                    i = (int) d;
-                } catch (Exception e) {
-                    i = -1;
-                }
-
+                Log.e("andstepko", "login response==>" + response);
                 Log.i("SERVICE", "got errorCode==>" + String.valueOf(myHttpResponse.getErrorCode()));
 
-                if (i != -1) {
-                    SharedPreferences.Editor e = settings.edit();
-                    e.putInt("idChild", i);
-                    e.apply();
-                    return true;
-                } else {
-                    // Server returned error.
+                if(response.equals(SERVER_ERROR_RESPONSE)){
                     return false;
                 }
+                return true;
             } else {
                 return false;
             }
@@ -157,14 +163,14 @@ public class LoginActivity extends Activity {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             if (aBoolean) {
-
-                Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.login_successful), Toast.LENGTH_SHORT).show();
+                afterSuccessfulLogin(response);
             } else {
-                Toast.makeText(context, "Login unsuccessful", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.login_unsuccessful), Toast.LENGTH_SHORT).show();
+                afterFailedLogin();
             }
 
             this.loadingDialog.dismiss();
-            afterLoginBehaviour(aBoolean);
         }
     }
 }

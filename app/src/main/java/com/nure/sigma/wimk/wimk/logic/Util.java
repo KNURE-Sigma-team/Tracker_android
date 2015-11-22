@@ -13,18 +13,14 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -37,7 +33,7 @@ public class Util {
             JSONParser parser = new JSONParser();
 
             try {
-                File file = new File(context.getFilesDir().getPath() + Info.LOCATIONS_FILE);
+                File file = new File(context.getFilesDir().getPath() + Info.LOCATIONS_FILE_NAME);
                 if (!file.exists()) {
                     file.createNewFile();
                 }
@@ -54,7 +50,7 @@ public class Util {
                         location.setLatitude(Double.valueOf(object.get(Info.LATITUDE).toString()));
                         location.setTime(Long.valueOf(object.get(Info.TIME).toString()));
                         location.setLongitude(Double.valueOf(object.get(Info.LONGITUDE).toString()));
-                        Info.FILE_LIST.add(new Pair<Location, String>(location, object.get(Info.BATTERY_LEVEL).toString()));
+                        Info.getInstance().FAILED_LOCATIONS_LIST.add(new Pair<Location, String>(location, object.get(Info.BATTERY_LEVEL).toString()));
                     }
                     jsonObject.clear();
                     array = new JSONArray();
@@ -74,13 +70,13 @@ public class Util {
     public static void writeListToFile(Context context) {
         ObjectOutputStream out = null;
         try {
-            File file = new File(context.getFilesDir().getPath() + Info.LOCATIONS_FILE);
+            File file = new File(context.getFilesDir().getPath() + Info.LOCATIONS_FILE_NAME);
             if (!file.exists()) {
                 file.createNewFile();
             }
             JSONObject obj = new JSONObject();
             JSONArray locations = new JSONArray();
-            for (Pair<Location, String> pair : Info.FILE_LIST) {
+            for (Pair<Location, String> pair : Info.getInstance().FAILED_LOCATIONS_LIST) {
                 JSONObject location = new JSONObject();
                 location.put(Info.LATITUDE, pair.first.getLatitude());
                 location.put(Info.LONGITUDE, pair.first.getLongitude());
@@ -100,7 +96,7 @@ public class Util {
     }
 
     public static void addToFileList(Pair<Location, String> pair, Context context) {
-        Info.FILE_LIST.add(pair);
+        Info.getInstance().FAILED_LOCATIONS_LIST.add(pair);
         writeListToFile(context);
     }
 

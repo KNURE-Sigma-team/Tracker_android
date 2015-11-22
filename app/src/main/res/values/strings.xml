@@ -17,6 +17,9 @@
 
     <!-- SOSButtonWidget -->
     <string name="SOSButton">SOS</string>
+    <string name="login_unsuccessful">Login unsuccessful</string>
+    <string name="login_successful">Login successful</string>
+    <string name="no_children_error">You have no children</string>
     <!-- SOSButtonWidget -->
 
 </resources>
