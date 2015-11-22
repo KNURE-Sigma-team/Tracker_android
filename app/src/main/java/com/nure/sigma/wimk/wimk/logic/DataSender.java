@@ -14,13 +14,15 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.util.List;
 
-
+/**
+ * Created by andstepko on 31.10.15.
+ */
 public class DataSender {
     public DataSender() {
     }
 
     public MyHttpResponse HttpPostQuery(String serverUrl, List<Pair<String, String>> pairs,
-                                        int waitResponseTimeout) {
+                                        int waitResponseTimeout){
         try {
             URL obj = null;
             try {
@@ -94,13 +96,14 @@ public class DataSender {
                 e.printStackTrace();
                 return new MyHttpResponse(MyHttpResponse.GET_RESPONSE_FAIL, null);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e){
             return new MyHttpResponse(MyHttpResponse.UNKNOWN_ERROR, null);
         }
     }
 
-    public MyHttpResponse HttpGetQuery(String serverUrl, int waitResponseTimeout) {
-        try {
+    public MyHttpResponse HttpGetQuery(String serverUrl, int waitResponseTimeout){
+        try{
             URL obj = null;
             try {
                 obj = new URL(serverUrl);
@@ -117,7 +120,7 @@ public class DataSender {
                 return new MyHttpResponse(MyHttpResponse.OPEN_CONNECTION_FAIL, null);
             }
 
-            if (connection == null) {
+            if(connection == null){
                 return new MyHttpResponse(MyHttpResponse.NULL_CONNECTION, null);
             }
 
@@ -135,12 +138,13 @@ public class DataSender {
             InputStream inputStream = null;
             try {
                 inputStream = connection.getInputStream();
-            } catch (IOException e) {
+            }
+            catch (IOException e){
                 e.printStackTrace();
                 return new MyHttpResponse(MyHttpResponse.GET_RESPONSE_FAIL, null);
             }
 
-            try {
+            try{
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader bufReader = new BufferedReader(inputStreamReader);
 
@@ -151,16 +155,18 @@ public class DataSender {
                     response.append(inputLine);
                 }
                 bufReader.close();
-            } catch (IOException e) {
+            }
+            catch (IOException e){
                 return new MyHttpResponse(MyHttpResponse.OUTPUT_STREAM_FAIL, null);
             }
 
-            if (response == null) {
+            if(response == null){
                 return new MyHttpResponse(MyHttpResponse.RESPONSE_NULL, null);
             }
 
             return new MyHttpResponse(MyHttpResponse.OK, response.toString());
-        } catch (Exception e) {
+        }
+        catch (Exception e){
             return new MyHttpResponse(MyHttpResponse.UNKNOWN_ERROR, null);
         }
     }

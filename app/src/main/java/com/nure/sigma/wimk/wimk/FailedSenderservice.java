@@ -51,7 +51,9 @@ public class FailedSenderservice extends IntentService {
                 Util.logRecord("Sending failed locations");
                 Util.logRecord(Info.ID_CHILD + " = " + idChild);
                 for (Pair<Location, String> pair : Info.FILE_LIST) {
+
                     List<Pair<String, String>> pairs = new ArrayList<>();
+
                     pairs.add(new Pair<>(Info.ID_CHILD, String.valueOf(idChild)));
                     pairs.add(new Pair<>(Info.LONGITUDE, String.valueOf(pair.first.getLongitude())));
                     pairs.add(new Pair<>(Info.LATITUDE, String.valueOf(pair.first.getLatitude())));

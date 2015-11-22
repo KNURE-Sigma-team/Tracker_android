@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class Info {
 
-    public static final String SERVER_URL = "http://178.165.37.203:8080/wimk/";
+    public static final String SERVER_URL = "http://blockverify.cloudapp.net:8080/wimk/";
     public static final String EMPTY_STRING = "";
     public static final String SERVICE_TAG = "SERVICE";
 

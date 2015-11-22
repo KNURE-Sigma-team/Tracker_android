@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import java.util.Arrays;
 
@@ -67,7 +66,6 @@ public class SOSButtonWidget extends AppWidgetProvider {
         if (intent.getAction().equalsIgnoreCase("com.nure.sigma.wimk.wimk.WIDGET_CLICK")) {
             Intent i = new Intent(context.getApplicationContext(), SOSService.class);
             context.getApplicationContext().startService(i);
-            Toast.makeText(context, "SOS button pressed!!", Toast.LENGTH_SHORT).show();
         }
     }
 }
