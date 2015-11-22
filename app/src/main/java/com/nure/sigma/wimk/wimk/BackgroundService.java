@@ -52,10 +52,10 @@ public class BackgroundService extends IntentService {
             Util.logRecord(String.valueOf(myHttpResponse.getErrorCode()));
 //            Util.fillFileList(this);
 //            ArrayList<Pair<Location, String>> tempList = new ArrayList<>();
-            /*if (Info.FILE_LIST != null && !Info.FILE_LIST.isEmpty() && myHttpResponse.getErrorCode() == MyHttpResponse.OK) {
+            /*if (Info.FAILED_LOCATIONS_LIST != null && !Info.FAILED_LOCATIONS_LIST.isEmpty() && myHttpResponse.getErrorCode() == MyHttpResponse.OK) {
                 Util.logRecord("Sending failed locations");
                 Util.logRecord(Info.ID_CHILD + " = " + idChild);
-                for (Pair<Location, String> pair : Info.FILE_LIST) {
+                for (Pair<Location, String> pair : Info.FAILED_LOCATIONS_LIST) {
 
                     List<Pair<String, String>> pairs = new ArrayList<>();
 
@@ -72,7 +72,7 @@ public class BackgroundService extends IntentService {
                         tempList.add(new Pair<Location, String>(pair.first, pair.second));
                     }
                 }
-                Info.FILE_LIST = new ArrayList<>();
+                Info.FAILED_LOCATIONS_LIST = new ArrayList<>();
                 for (Pair<Location, String> pair : tempList) {
                     Util.addToFileList(pair, getApplicationContext());
                 }

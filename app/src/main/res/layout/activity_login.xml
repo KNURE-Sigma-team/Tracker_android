@@ -43,15 +43,15 @@
         android:layout_below="@+id/password_editText"
         android:layout_centerHorizontal="true" />
 
-    <EditText
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/loginChild_editText"
-        android:hint="@string/child_name"
-        android:layout_below="@+id/password_editText"
-        android:layout_centerHorizontal="true"
-        android:maxLines="1"
-        android:minLines="1"
-        android:maxLength="32"
-        android:singleLine="true" />
+    <!--<EditText-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/loginChild_editText"-->
+        <!--android:hint="@string/child_name"-->
+        <!--android:layout_below="@+id/password_editText"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:maxLines="1"-->
+        <!--android:minLines="1"-->
+        <!--android:maxLength="32"-->
+        <!--android:singleLine="true" />-->
 </RelativeLayout>

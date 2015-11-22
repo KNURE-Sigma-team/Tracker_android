@@ -115,16 +115,18 @@ public class MainActivity extends AppCompatActivity {
         logRecord("NETWORK==>" + networkEnabled);
 
         if (gpsEnabled || networkEnabled) {
+            // Hang listeners, specified below
             try {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                         0, 1, locationListener);
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                         0, 1, locationListener);
             } catch (SecurityException se) {
+                // Almost never happens.
                 logRecord("SECURITY_EXCEPTION");
             }
         } else {
-            // Report switching the geo-location off in settings.
+            // TODO Report switching the geo-location off in settings to the mother.
         }
     }
 
@@ -227,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             //Getting idChild, which setting in LoginActivity.
-            SharedPreferences settings = getSharedPreferences(Info.getInstance().PASSWORD, 0);
+            SharedPreferences settings = getSharedPreferences(Info.PASSWORD, 0);
             idChild = settings.getInt(info.ID_CHILD, 0);
             logRecord(info.ID_CHILD + "==>" + idChild);
         }
