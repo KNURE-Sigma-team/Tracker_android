@@ -26,8 +26,13 @@ public class SOSService extends IntentService {
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    public int onStartCommand(Intent intent, int flags, int startId) {
         handler = new Handler();
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent) {
         SharedPreferences settings = getSharedPreferences(Info.PASSWORD, 0);
         int idChild = settings.getInt(Info.ID_CHILD, -1);
         if (idChild != -1) {
@@ -35,6 +40,12 @@ public class SOSService extends IntentService {
             LocationSender locationSender = new LocationSender(Info.SOS, this);
             MyHttpResponse myHttpResponse = locationSender.sendLocation();
             Log.i(Info.SERVICE_TAG, "Service Stopping!");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(), "Send SOS message!", Toast.LENGTH_LONG).show();
+                }
+            });
         }
         else {
             handler.post(new Runnable() {

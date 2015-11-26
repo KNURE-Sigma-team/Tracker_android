@@ -50,35 +50,6 @@ public class BackgroundService extends IntentService {
             LocationSender locationSender = new LocationSender(Info.COMMON, this);
             MyHttpResponse myHttpResponse = locationSender.sendLocation();
             Util.logRecord(String.valueOf(myHttpResponse.getErrorCode()));
-//            Util.fillFileList(this);
-//            ArrayList<Pair<Location, String>> tempList = new ArrayList<>();
-            /*if (Info.FILE_LIST != null && !Info.FILE_LIST.isEmpty() && myHttpResponse.getErrorCode() == MyHttpResponse.OK) {
-                Util.logRecord("Sending failed locations");
-                Util.logRecord(Info.ID_CHILD + " = " + idChild);
-                for (Pair<Location, String> pair : Info.FILE_LIST) {
-
-                    List<Pair<String, String>> pairs = new ArrayList<>();
-
-                    pairs.add(new Pair<>(Info.ID_CHILD, String.valueOf(idChild)));
-                    pairs.add(new Pair<>(Info.LONGITUDE, String.valueOf(pair.first.getLongitude())));
-                    pairs.add(new Pair<>(Info.LATITUDE, String.valueOf(pair.first.getLatitude())));
-                    pairs.add(new Pair<>(Info.TIME, (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
-                            .format(new Date(pair.first.getTime()))));
-                    pairs.add(new Pair<>(Info.BATTERY_LEVEL, pair.second));
-                    pairs.add(new Pair<>(Info.POINT_TYPE, Info.COMMON));
-                    DataSender dataSender = new DataSender();
-                    myHttpResponse = dataSender.HttpPostQuery(MOBILE_GET_POINT_URL, pairs, Info.WAIT_TIME);
-                    if (myHttpResponse.getErrorCode() != MyHttpResponse.OK) {
-                        tempList.add(new Pair<Location, String>(pair.first, pair.second));
-                    }
-                }
-                Info.FILE_LIST = new ArrayList<>();
-                for (Pair<Location, String> pair : tempList) {
-                    Util.addToFileList(pair, getApplicationContext());
-                }
-                Util.logRecord("Stop sending failed locations");
-            }*/
-
             Log.i(Info.SERVICE_TAG, "Service Stopping!");
 
             //Creating notification for starting IntentService in Foreground.

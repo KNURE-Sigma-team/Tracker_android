@@ -19,13 +19,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p/>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
- */
 public class FailedSenderservice extends IntentService {
 
     public static final String MOBILE_GET_POINT_URL = Info.getInstance().SERVER_URL + "mobile_get_point";
@@ -42,25 +35,23 @@ public class FailedSenderservice extends IntentService {
         if (networkInfo != null && networkInfo.isConnected()) {
             Util.logRecord(networkInfo.getTypeName());
             Util.fillFileList(getApplicationContext());
-            Util.logRecord(String.valueOf(Info.FILE_LIST.size()));
-            if (Info.FILE_LIST != null && !Info.FILE_LIST.isEmpty()) {
+            Util.logRecord(String.valueOf(Info.getInstance().FAILED_LOCATIONS_LIST.size()));
+            if (Info.getInstance().FAILED_LOCATIONS_LIST != null && !Info.getInstance().FAILED_LOCATIONS_LIST.isEmpty()) {
                 Util.logRecord(networkInfo.getTypeName());
                 SharedPreferences temp = getApplicationContext().getSharedPreferences(Info.PASSWORD, 0);
                 int idChild = temp.getInt(Info.ID_CHILD, 0);
                 ArrayList<Pair<Location, String>> tempList = new ArrayList<>();
                 Util.logRecord("Sending failed locations");
                 Util.logRecord(Info.ID_CHILD + " = " + idChild);
-                for (Pair<Location, String> pair : Info.FILE_LIST) {
-
+                for (Pair<Location, String> pair : Info.getInstance().FAILED_LOCATIONS_LIST) {
                     List<Pair<String, String>> pairs = new ArrayList<>();
-
                     pairs.add(new Pair<>(Info.ID_CHILD, String.valueOf(idChild)));
                     pairs.add(new Pair<>(Info.LONGITUDE, String.valueOf(pair.first.getLongitude())));
                     pairs.add(new Pair<>(Info.LATITUDE, String.valueOf(pair.first.getLatitude())));
                     pairs.add(new Pair<>(Info.TIME, (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
                             .format(new Date(pair.first.getTime()))));
                     pairs.add(new Pair<>(Info.BATTERY_LEVEL, pair.second));
-                    pairs.add(new Pair<>(Info.POINT_TYPE, Info.COMMON));
+                    pairs.add(new Pair<>(Info.POINT_TYPE, Info.STORAGED));
                     DataSender dataSender = new DataSender();
                     MyHttpResponse myHttpResponse = dataSender.HttpPostQuery(MOBILE_GET_POINT_URL, pairs, Info.WAIT_TIME);
                     Util.logRecord(String.valueOf(myHttpResponse.getErrorCode()));
@@ -68,7 +59,7 @@ public class FailedSenderservice extends IntentService {
                         tempList.add(new Pair<Location, String>(pair.first, pair.second));
                     }
                 }
-                Info.FILE_LIST = new ArrayList<>();
+                Info.getInstance().FAILED_LOCATIONS_LIST = new ArrayList<>();
                 for (Pair<Location, String> pair : tempList) {
                     Util.addToFileList(pair, getApplicationContext());
                 }

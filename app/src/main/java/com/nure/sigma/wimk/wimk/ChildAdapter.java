@@ -13,9 +13,7 @@ import com.nure.sigma.wimk.wimk.logic.Child;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by andstepko on 22.11.15.
- */
+
 public class ChildAdapter extends BaseAdapter {
 
     private List<Child> list;
