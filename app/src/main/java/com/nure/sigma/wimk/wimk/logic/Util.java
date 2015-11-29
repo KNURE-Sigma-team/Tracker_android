@@ -23,6 +23,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 
 public class Util {
@@ -50,7 +51,9 @@ public class Util {
                         location.setLatitude(Double.valueOf(object.get(Info.LATITUDE).toString()));
                         location.setTime(Long.valueOf(object.get(Info.TIME).toString()));
                         location.setLongitude(Double.valueOf(object.get(Info.LONGITUDE).toString()));
-                        Info.getInstance().FAILED_LOCATIONS_LIST.add(new Pair<Location, String>(location, object.get(Info.BATTERY_LEVEL).toString()));
+                        Info.getInstance().addFailedLocation(
+                                new Pair<Location, String>(location,
+                                        object.get(Info.BATTERY_LEVEL).toString()));
                     }
                     jsonObject.clear();
                     array = new JSONArray();
@@ -67,7 +70,8 @@ public class Util {
         }
     }
 
-    public static void writeListToFile(Context context) {
+    public static void writeListToFile(List<Pair<Location, String>> locationList,
+                                       Context context) {
         ObjectOutputStream out = null;
         try {
             File file = new File(context.getFilesDir().getPath() + Info.LOCATIONS_FILE_NAME);
@@ -76,7 +80,7 @@ public class Util {
             }
             JSONObject obj = new JSONObject();
             JSONArray locations = new JSONArray();
-            for (Pair<Location, String> pair : Info.getInstance().FAILED_LOCATIONS_LIST) {
+            for (Pair<Location, String> pair : locationList) {
                 JSONObject location = new JSONObject();
                 location.put(Info.LATITUDE, pair.first.getLatitude());
                 location.put(Info.LONGITUDE, pair.first.getLongitude());
@@ -87,8 +91,10 @@ public class Util {
             obj.put("Locations list", locations);
             FileWriter fileWriter = new FileWriter(file);
             fileWriter.write(obj.toJSONString());
+
             System.out.println("Successfully Copied JSON Object to File...");
             System.out.println("\nJSON Object: " + obj);
+
             fileWriter.close();
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -96,22 +102,22 @@ public class Util {
     }
 
     public static void addToFileList(Pair<Location, String> pair, Context context) {
-        Info.getInstance().FAILED_LOCATIONS_LIST.add(pair);
-        writeListToFile(context);
+        Info.getInstance().addFailedLocation(pair);
+        writeListToFile(Info.getInstance().getFailedLocations(), context);
     }
 
 
     //Getting battery level.
-    public static int getBatteryLevel(Context context) {
-        Intent batteryIntent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-        int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-        if (level == -1 || scale == -1) {
-            return 50;
-        }
-
-        return (int) (((float) level / (float) scale) * 100.0f);
-    }
+//    public static int getBatteryLevel(Context context) {
+//        Intent batteryIntent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+//        int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+//        int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+//        if (level == -1 || scale == -1) {
+//            return 50;
+//        }
+//
+//        return (int) (((float) level / (float) scale) * 100.0f);
+//    }
 
     public static String formatLocation(Location location) {
         if (location == null) {

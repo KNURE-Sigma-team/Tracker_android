@@ -9,31 +9,47 @@ import java.util.List;
 public class Child {
 
     public static final String ARGUMENTS_SPLITTER = ";";
+    public static final String AUTHORISED_CHILD_FALSE = "0";
 
-    private int id;
     private String name;
-
-    public int getId() {
-        return id;
-    }
+    private int sendingFrequency;
+    private boolean authorised;
 
     public String getName() {
         return name;
     }
 
-    public Child(int id, String name) {
-        this.id = id;
+    public int getSendingFrequency() {
+        return sendingFrequency;
+    }
+
+    public boolean isAuthorised() {
+        return authorised;
+    }
+
+    public Child(String name, int sendingFrequency, boolean authorised) {
         this.name = name;
+        this.sendingFrequency = sendingFrequency;
+        this.authorised = authorised;
     }
 
     public Child(String childString){
         String[] arguments = childString.split(ARGUMENTS_SPLITTER);
-        if(arguments.length == 2){
-            id = Integer.parseInt(arguments[0]);
-            name = arguments[1];
+        if(arguments.length == 3){
+            name = arguments[0];
+            try {
+                sendingFrequency = Integer.parseInt(arguments[1]);
+            }
+            catch (NumberFormatException e){
+                sendingFrequency = -1;
+                return;
+            }
+            if(arguments[2] != AUTHORISED_CHILD_FALSE){
+                authorised = true;
+            }
         }
         else {
-            id = -1;
+            sendingFrequency = -1;
         }
     }
 
@@ -44,7 +60,7 @@ public class Child {
 
         for(String childString : childStrings){
             child = new Child(childString);
-            if(child.getId() != -1){
+            if(child.getSendingFrequency() != -1){
                 result.add(child);
             }
         }

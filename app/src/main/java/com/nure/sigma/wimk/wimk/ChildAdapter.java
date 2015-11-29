@@ -59,9 +59,19 @@ public class ChildAdapter extends BaseAdapter {
         }
 
         TextView childNameTextView = (TextView)view.findViewById(R.id.childItemTextView);
+        TextView loggedTextView = (TextView)view.findViewById(R.id.loggedTextView);
 
         Child child = list.get(i);
         childNameTextView.setText(child.getName());
+
+        if(child.isAuthorised()){
+            view.setBackgroundResource(R.color.loggedChildBackgorund);
+            loggedTextView.setVisibility(View.VISIBLE);
+        }
+        else{
+            view.setBackgroundResource(R.color.unloggedChildBackgorund);
+            loggedTextView.setVisibility(View.GONE);
+        }
 
         return view;
     }

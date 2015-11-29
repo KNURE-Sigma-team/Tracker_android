@@ -1,8 +1,6 @@
 package com.nure.sigma.wimk.wimk.logic;
 
-import android.app.IntentService;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
@@ -17,10 +15,7 @@ import java.util.List;
 
 public class LocationSender {
 
-    public static final String MOBILE_GET_POINT_URL = Info.getInstance().SERVER_URL + "mobile_get_point";
     public static final String SERVICE_TAG = "SERVICE";
-
-    public static int idChild;
 
     private int batteryLevel;
     private Location locationPASSIVE = null;
@@ -39,6 +34,15 @@ public class LocationSender {
         Log.i(SERVICE_TAG, "Service Started!");
         LocationManager locationManager = (LocationManager) context
                 .getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+
+        boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean networkEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if((!gpsEnabled) && (!networkEnabled)){
+            // Both locations are switched off in settings!!!
+            return sendDropGeolocation();
+        }
+
+        // Geolocation is switched on.
         try {
             locationNETWORK = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
         } catch (SecurityException se) {
@@ -55,7 +59,7 @@ public class LocationSender {
             Util.logRecord("SECURITY_EXCEPTION");
         }
 
-        batteryLevel = Util.getBatteryLevel(context.getApplicationContext());
+        batteryLevel = Info.getInstance().getBatteryLevel(context.getApplicationContext());
 
         if (locationGPS != null) {
             Util.logRecord(Util.formatLocation(locationGPS));
@@ -65,16 +69,14 @@ public class LocationSender {
             Util.logRecord(Util.formatLocation(locationPASSIVE));
         } else {
             Util.logRecord("All locations are null.");
+            return sendDropGeolocation();
         }
         Util.logRecord(Util.formatBatteryLevel(batteryLevel));
         Util.logRecord("-------------------------------------------------------------");
 
-        SharedPreferences settings = context.getSharedPreferences(Info.PASSWORD, 0);
-        idChild = settings.getInt(Info.ID_CHILD, 0);
-        Util.logRecord(Info.ID_CHILD + " = " + idChild);
 
-        List<Pair<String, String>> pairs = new ArrayList<>();
-        pairs.add(new Pair<>(Info.ID_CHILD, String.valueOf(idChild)));
+        List<Pair<String, String>> pairs = Info.getInstance().getLoginsListForHttp(context);
+
         // Choose, which location to sendLocation.
         Location resultLocation;
         if (Util.isGPSMoreAccurateLocation(locationGPS, locationNETWORK, locationPASSIVE)) {
@@ -92,12 +94,20 @@ public class LocationSender {
 
         pairs.add(new Pair<>(Info.BATTERY_LEVEL, String.valueOf(batteryLevel)));
         pairs.add(new Pair<>(Info.POINT_TYPE, pointType));
+
         //Sending
         DataSender dataSender = new DataSender();
-        MyHttpResponse myHttpResponse = dataSender.HttpPostQuery(MOBILE_GET_POINT_URL, pairs, Info.WAIT_TIME);
+        MyHttpResponse myHttpResponse = dataSender.httpPostQuery(Info.MOBILE_GET_POINT_URL, pairs, Info.WAIT_TIME);
         if (myHttpResponse.getErrorCode() != MyHttpResponse.OK) {
-            Util.addToFileList(new Pair<Location, String>(resultLocation, String.valueOf(batteryLevel)), context);
+            Util.addToFileList(new Pair<Location, String>(resultLocation,
+                    String.valueOf(batteryLevel)), context);
         }
         return myHttpResponse;
+    }
+
+    private MyHttpResponse sendDropGeolocation(){
+        DataSender dataSender = new DataSender();
+        return dataSender.httpPostQuery(Info.DROP_GEO_SERVER_URL,
+                Info.getInstance().getLoginsListForHttp(context), Info.WAIT_TIME);
     }
 }

@@ -21,7 +21,7 @@ public class DataSender {
     public DataSender() {
     }
 
-    public MyHttpResponse HttpPostQuery(String serverUrl, List<Pair<String, String>> pairs,
+    public MyHttpResponse httpPostQuery(String serverUrl, List<Pair<String, String>> pairs,
                                         int waitResponseTimeout){
         try {
             URL obj = null;
@@ -70,7 +70,7 @@ public class DataSender {
                 wr.close();
             } catch (IOException e) {
                 e.printStackTrace();
-                return new MyHttpResponse(MyHttpResponse.OUTPUT_STREAM_FAIL, null);
+                return new MyHttpResponse(MyHttpResponse.GET_RESPONSE_FAIL, null);
             }
 
             String response = null;
@@ -102,7 +102,7 @@ public class DataSender {
         }
     }
 
-    public MyHttpResponse HttpGetQuery(String serverUrl, int waitResponseTimeout){
+    public MyHttpResponse httpGetQuery(String serverUrl, int waitResponseTimeout){
         try{
             URL obj = null;
             try {

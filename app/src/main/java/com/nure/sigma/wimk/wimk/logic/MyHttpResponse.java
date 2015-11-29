@@ -33,4 +33,9 @@ public class MyHttpResponse {
         this.errorCode = errorCode;
         this.response = response;
     }
+
+    @Override
+    public String toString() {
+        return "errorCode==>" + getErrorCode() + " response==>" + getResponse();
+    }
 }

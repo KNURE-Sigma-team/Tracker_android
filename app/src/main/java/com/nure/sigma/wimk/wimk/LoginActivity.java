@@ -24,9 +24,6 @@ import java.util.List;
 
 public class LoginActivity extends Activity {
 
-    public static final String AUTH_URL = Info.getInstance().SERVER_URL + "mobile_authorization";
-    public static final int WAIT_TIME = Info.getInstance().WAIT_TIME;
-
     SharedPreferences settings;
     Info info = Info.getInstance();
 
@@ -88,7 +85,7 @@ public class LoginActivity extends Activity {
 
     private void moveToMainActivity(Child child) {
         SharedPreferences.Editor e = settings.edit();
-        e.putInt(Info.ID_CHILD, child.getId());
+        e.putString(Info.CHILD_LOGIN, child.getName());
         e.commit();
 
         Intent intent = new Intent(this, MainActivity.class);
@@ -135,11 +132,11 @@ public class LoginActivity extends Activity {
             List<Pair<String, String>> pairs = new ArrayList<>();
             pairs.add(new Pair<String, String>("loginParent", username));
             //pairs.add(new Pair<String, String>("loginChild", loginChild));
-            pairs.add(new Pair<String, String>("password", password));
+            pairs.add(new Pair<String, String>(Info.PASSWORD, password));
 
-            int id;
             DataSender dataSender = new DataSender();
-            MyHttpResponse myHttpResponse = dataSender.HttpPostQuery(AUTH_URL, pairs, WAIT_TIME);
+            MyHttpResponse myHttpResponse = dataSender.httpPostQuery(
+                    Info.AUTH_SERVER_URL, pairs, Info.WAIT_TIME);
             int errorCode = myHttpResponse.getErrorCode();
 
             Log.e("andstepko", "errorCode from Server==>" + errorCode);
@@ -163,6 +160,10 @@ public class LoginActivity extends Activity {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             if (aBoolean) {
+                SharedPreferences.Editor e = settings.edit();
+                e.putString(Info.PARENT_LOGIN, username);
+                e.commit();
+
                 Toast.makeText(context, context.getString(R.string.login_successful), Toast.LENGTH_SHORT).show();
                 afterSuccessfulLogin(response);
             } else {
