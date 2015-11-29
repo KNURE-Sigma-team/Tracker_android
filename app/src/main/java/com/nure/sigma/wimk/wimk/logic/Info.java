@@ -29,7 +29,7 @@ public class Info {
     //public static final String SERVER_URL = "http://178.165.37.203:8080/wimk/";
 
     public static final String AUTH_SERVER_URL = SERVER_URL + "mobile_authorization";
-    public static final String TOKEN_SERVER_URL = SERVER_URL + "mobile_set_child_token/";
+    public static final String TOKEN_SERVER_URL = SERVER_URL + "mobile_set_child_token";
     public static final String LOGOUT_SERVER_URL = SERVER_URL + "mobile_logout";
     public static final String DROP_GEO_SERVER_URL = SERVER_URL + "mobile_drop_geo";
     public static final String MOBILE_GET_POINT_URL = SERVER_URL + "mobile_get_point";

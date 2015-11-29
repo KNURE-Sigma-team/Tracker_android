@@ -54,7 +54,7 @@ public class BackgroundService extends IntentService {
             startForeground(300, notification);
 
             try {
-                TimeUnit.SECONDS.sleep(frequency);
+                TimeUnit.SECONDS.sleep(frequency * 60);
             } catch (Exception e) {
                 Log.e(Info.SERVICE_TAG, e.toString());
             }
