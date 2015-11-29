@@ -49,6 +49,7 @@ public class Info {
 
     public static final String COMMON = "common";
     public static final String SOS = "sos";
+    public static final String STORAGED = "storaged";
     public static final String ON_DEMAND = "on_demand";
 
     public static final String RUNNING = "running";
@@ -69,18 +70,10 @@ public class Info {
     private  List<Child> childList = new ArrayList<>();
 
     public List<Child> getChildList(){
-        return CHILD_LIST;
+        return childList;
     }
     public void setChildList( List<Child> childList){
-        CHILD_LIST = childList;
-    }
-    private static Info ourInstance = new Info();
-
-    public static Info getInstance() {
-        return ourInstance;
-    }
-
-    private Info() {
+        this.childList = childList;
     }
 
     public List<Pair<Location, String>> getFailedLocations(){

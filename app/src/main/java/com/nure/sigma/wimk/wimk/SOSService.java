@@ -33,9 +33,6 @@ public class SOSService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        SharedPreferences settings = getSharedPreferences(Info.PASSWORD, 0);
-        int idChild = settings.getInt(Info.ID_CHILD, -1);
-        if (idChild != -1) {
             Log.i(Info.SERVICE_TAG, "Service Starting!");
             LocationSender locationSender = new LocationSender(Info.SOS, this);
             MyHttpResponse myHttpResponse = locationSender.sendLocation();
@@ -46,14 +43,5 @@ public class SOSService extends IntentService {
                     Toast.makeText(getApplicationContext(), "Send SOS message!", Toast.LENGTH_LONG).show();
                 }
             });
-        }
-        else {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getApplicationContext(), "Cann`t find ID of child. Please, login in application, before using SOS button.", Toast.LENGTH_LONG).show();
-                }
-            });
-        }
     }
 }

@@ -34,6 +34,8 @@ public class FailedSenderService extends IntentService {
             Util.logRecord(networkInfo.getTypeName());
             Util.fillFileList(getApplicationContext());
 
+            Info info = Info.getInstance();
+
             Util.logRecord(String.valueOf(info.getFailedLocations().size()));
             if (info.getFailedLocations() != null && !info.getFailedLocations().isEmpty()) {
                 Util.logRecord("Sending failed locations");
