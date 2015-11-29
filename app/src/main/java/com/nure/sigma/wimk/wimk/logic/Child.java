@@ -44,7 +44,7 @@ public class Child {
                 sendingFrequency = -1;
                 return;
             }
-            if(arguments[2] != AUTHORISED_CHILD_FALSE){
+            if(!arguments[2].equals(AUTHORISED_CHILD_FALSE)){
                 authorised = true;
             }
         }

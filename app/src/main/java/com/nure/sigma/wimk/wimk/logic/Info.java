@@ -1,12 +1,17 @@
 package com.nure.sigma.wimk.wimk.logic;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.util.Pair;
+
+import com.nure.sigma.wimk.wimk.BackgroundService;
+import com.nure.sigma.wimk.wimk.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,5 +114,72 @@ public class Info {
         }
 
         return (int) (((float) level / (float) scale) * 100.0f);
+    }
+
+    public void startBackgroundService(Context context){
+        SharedPreferences settings = context.getSharedPreferences(PASSWORD, 0);
+        SharedPreferences.Editor e = settings.edit();
+
+        e.putBoolean(RUNNING, true);
+        e.apply();
+
+        context.startService(new Intent(context.getApplicationContext(), BackgroundService.class));
+    }
+
+    public void stopBackgroundService(Context context){
+        SharedPreferences settings = context.getSharedPreferences(PASSWORD, 0);
+        SharedPreferences.Editor e = settings.edit();
+        e.putBoolean(RUNNING, false);
+        e.apply();
+
+        context.stopService(new Intent(context, BackgroundService.class));
+    }
+
+    public void moveToMainActivity(Activity contextActivity, String childName, int sendingFrequency){
+        stopBackgroundService(contextActivity);
+
+        // Log out
+        SharedPreferences settings = contextActivity.getSharedPreferences(PASSWORD, 0);
+        SharedPreferences.Editor editor = settings.edit();
+
+        String parentLogin = settings.getString(Info.PARENT_LOGIN, null);
+        String childLogin = settings.getString(Info.CHILD_LOGIN, null);
+        if((parentLogin != null) && (childLogin != null)) {
+            LogOutTask logOutTask = new LogOutTask(parentLogin, childLogin);
+            logOutTask.execute();
+        }
+        new LogOutTask(parentLogin, childLogin).execute();
+
+        // Save new data to DB
+        editor = settings.edit();
+        editor.putString(Info.CHILD_LOGIN, childName);
+        editor.putInt(Info.SENDING_FREQUENCY, sendingFrequency);
+        editor.commit();
+
+        Intent intent = new Intent(contextActivity, MainActivity.class);
+        contextActivity.startActivity(intent);
+    }
+
+    private class LogOutTask extends AsyncTask<Void, Void, Void> {
+
+        private String parentLogin;
+        private String childLogin;
+
+        public LogOutTask(String parentLogin, String childLogin) {
+            this.parentLogin = parentLogin;
+            this.childLogin = childLogin;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            DataSender dataSender = new DataSender();
+            List<Pair<String, String>> pairs = new ArrayList<>();
+            pairs.add(new Pair<>(Info.PARENT_LOGIN, parentLogin));
+            pairs.add(new Pair<>(Info.CHILD_LOGIN, childLogin));
+
+            MyHttpResponse myHttpResponse = dataSender.httpPostQuery
+                    (Info.LOGOUT_SERVER_URL, pairs, Info.WAIT_TIME);
+            return null;
+        }
     }
 }

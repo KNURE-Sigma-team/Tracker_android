@@ -71,25 +71,17 @@ public class LoginActivity extends Activity {
 
         List<Child> children = Child.parseChildrenList(serverResponse);
         if(children.size() == 0){
-            Toast.makeText(this, getString(R.string.no_children_error), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.no_children_error), Toast.LENGTH_LONG).show();
             return;
         }
         if(children.size() == 1){
-            moveToMainActivity(children.get(0));
+            Child child = children.get(0);
+            info.moveToMainActivity(LoginActivity.this, child.getName(), child.getSendingFrequency());
         }
         else{
             // Have many children
             moveToChooseChildActivity(children);
         }
-    }
-
-    private void moveToMainActivity(Child child) {
-        SharedPreferences.Editor e = settings.edit();
-        e.putString(Info.CHILD_LOGIN, child.getName());
-        e.commit();
-
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
     }
 
     private void moveToChooseChildActivity(List<Child> childList) {

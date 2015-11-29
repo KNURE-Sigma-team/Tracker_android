@@ -53,22 +53,22 @@ public class ChildAdapter extends BaseAdapter {
         if(view==null)
         {
             LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.child_list_item, viewGroup,false);
+            view = inflater.inflate(R.layout.child_list_item, viewGroup, false);
         }
 
         TextView childNameTextView = (TextView)view.findViewById(R.id.childItemTextView);
-        TextView loggedTextView = (TextView)view.findViewById(R.id.loggedTextView);
+        TextView trackedTextView = (TextView)view.findViewById(R.id.trackedTextView);
 
         Child child = list.get(i);
         childNameTextView.setText(child.getName());
 
         if(child.isAuthorised()){
-            view.setBackgroundResource(R.color.loggedChildBackgorund);
-            loggedTextView.setVisibility(View.VISIBLE);
+            view.setBackgroundResource(R.color.trackedChildBackgorund);
+            trackedTextView.setVisibility(View.VISIBLE);
         }
         else{
-            view.setBackgroundResource(R.color.unloggedChildBackgorund);
-            loggedTextView.setVisibility(View.GONE);
+            view.setBackgroundResource(R.color.untrackedChildBackgorund);
+            trackedTextView.setVisibility(View.GONE);
         }
 
         return view;
