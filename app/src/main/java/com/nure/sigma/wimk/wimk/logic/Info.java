@@ -68,12 +68,19 @@ public class Info {
     private List<Pair<Location, String>> failedLocationsList = new ArrayList<>();
     private  List<Child> childList = new ArrayList<>();
 
-    public List<Child> getChildList() {
-        return childList;
+    public List<Child> getChildList(){
+        return CHILD_LIST;
+    }
+    public void setChildList( List<Child> childList){
+        CHILD_LIST = childList;
+    }
+    private static Info ourInstance = new Info();
+
+    public static Info getInstance() {
+        return ourInstance;
     }
 
-    public void setChildList(List<Child> childList) {
-        this.childList = childList;
+    private Info() {
     }
 
     public List<Pair<Location, String>> getFailedLocations(){

@@ -19,16 +19,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p/>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
- */
-public class FailedSenderService extends IntentService {
 
-    private Info info = Info.getInstance();
+public class FailedSenderService extends IntentService {
 
     public FailedSenderService() {
         super("FailedSenderService");
@@ -51,14 +43,13 @@ public class FailedSenderService extends IntentService {
                 ArrayList<Pair<Location, String>> tempList = new ArrayList<>();
 
                 for (Pair<Location, String> pair : info.getFailedLocations()) {
-
                     List<Pair<String, String>> pairs = info.getLoginsListForHttp(getApplicationContext());
                     pairs.add(new Pair<>(Info.LONGITUDE, String.valueOf(pair.first.getLongitude())));
                     pairs.add(new Pair<>(Info.LATITUDE, String.valueOf(pair.first.getLatitude())));
                     pairs.add(new Pair<>(Info.TIME, (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
                             .format(new Date(pair.first.getTime()))));
                     pairs.add(new Pair<>(Info.BATTERY_LEVEL, pair.second));
-                    pairs.add(new Pair<>(Info.POINT_TYPE, Info.COMMON));
+                    pairs.add(new Pair<>(Info.POINT_TYPE, Info.STORAGED));
                     DataSender dataSender = new DataSender();
                     MyHttpResponse myHttpResponse = dataSender.httpPostQuery(
                             Info.MOBILE_GET_POINT_URL, pairs, Info.WAIT_TIME);
