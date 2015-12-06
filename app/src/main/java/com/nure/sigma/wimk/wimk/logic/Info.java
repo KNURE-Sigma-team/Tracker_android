@@ -172,14 +172,6 @@ public class Info {
         editor.putString(Info.CHILD_LOGIN, childName);
         editor.putInt(Info.SENDING_FREQUENCY, sendingFrequency);
         editor.commit();
-        Intent shortcut = new Intent(contextActivity.getApplicationContext(), ShortcutActivity.class);
-        shortcut.setAction(Intent.ACTION_MAIN);
-        Intent add = new Intent();
-        add.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcut);
-        add.putExtra(Intent.EXTRA_SHORTCUT_NAME, "SOS");
-        add.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, Intent.ShortcutIconResource.fromContext(contextActivity.getApplicationContext(), R.mipmap.ic_launcher))        ;
-        add.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
-        contextActivity.getApplicationContext().sendBroadcast(add);
         MyNotification.showNotificationOfSuccessfulShortcutCreating(contextActivity);
         Intent intent = new Intent(contextActivity, MainActivity.class);
         contextActivity.startActivity(intent);
@@ -204,13 +196,6 @@ public class Info {
             List<Pair<String, String>> pairs = new ArrayList<>();
             pairs.add(new Pair<>(Info.PARENT_LOGIN, parentLogin));
             pairs.add(new Pair<>(Info.CHILD_LOGIN, childLogin));
-            Intent shortcut = new Intent(context, ShortcutActivity.class);
-            shortcut.setAction(Intent.ACTION_MAIN);
-            Intent add = new Intent();
-            add.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcut);
-            add.putExtra(Intent.EXTRA_SHORTCUT_NAME, "SOS");
-            add.setAction("com.android.launcher.action.UNINSTALL_SHORTCUT");
-            context.sendBroadcast(add);
             MyHttpResponse myHttpResponse = dataSender.httpPostQuery
                     (Info.LOGOUT_SERVER_URL, pairs, Info.WAIT_TIME);
             return null;
