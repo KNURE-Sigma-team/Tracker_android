@@ -1,6 +1,7 @@
 package com.nure.sigma.wimk.wimk.logic;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -12,6 +13,9 @@ import android.util.Pair;
 
 import com.nure.sigma.wimk.wimk.BackgroundService;
 import com.nure.sigma.wimk.wimk.MainActivity;
+import com.nure.sigma.wimk.wimk.R;
+import com.nure.sigma.wimk.wimk.SOSService;
+import com.nure.sigma.wimk.wimk.ShortcutActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +77,19 @@ public class Info {
     // NON-STATIC
     private List<Pair<Location, String>> failedLocationsList = new ArrayList<>();
     private  List<Child> childList = new ArrayList<>();
+
+    private boolean firstSending = true;
+
+    public boolean isFirstSending() {
+        return firstSending;
+    }
+
+    public void setFirstSending(boolean firstSending) {
+        this.firstSending = firstSending;
+    }
+
+
+
 
     public List<Child> getChildList(){
         return childList;
@@ -145,17 +162,25 @@ public class Info {
         String parentLogin = settings.getString(Info.PARENT_LOGIN, null);
         String childLogin = settings.getString(Info.CHILD_LOGIN, null);
         if((parentLogin != null) && (childLogin != null)) {
-            LogOutTask logOutTask = new LogOutTask(parentLogin, childLogin);
+            LogOutTask logOutTask = new LogOutTask(parentLogin, childLogin,contextActivity);
             logOutTask.execute();
         }
-        new LogOutTask(parentLogin, childLogin).execute();
+        new LogOutTask(parentLogin, childLogin, contextActivity).execute();
 
         // Save new data to DB
         editor = settings.edit();
         editor.putString(Info.CHILD_LOGIN, childName);
         editor.putInt(Info.SENDING_FREQUENCY, sendingFrequency);
         editor.commit();
-
+        Intent shortcut = new Intent(contextActivity.getApplicationContext(), ShortcutActivity.class);
+        shortcut.setAction(Intent.ACTION_MAIN);
+        Intent add = new Intent();
+        add.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcut);
+        add.putExtra(Intent.EXTRA_SHORTCUT_NAME, "SOS");
+        add.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, Intent.ShortcutIconResource.fromContext(contextActivity.getApplicationContext(), R.mipmap.ic_launcher))        ;
+        add.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
+        contextActivity.getApplicationContext().sendBroadcast(add);
+        MyNotification.showNotificationOfSuccessfulShortcutCreating(contextActivity);
         Intent intent = new Intent(contextActivity, MainActivity.class);
         contextActivity.startActivity(intent);
     }
@@ -164,10 +189,13 @@ public class Info {
 
         private String parentLogin;
         private String childLogin;
+        private Context context;
 
-        public LogOutTask(String parentLogin, String childLogin) {
+
+        public LogOutTask(String parentLogin, String childLogin, Context context) {
             this.parentLogin = parentLogin;
             this.childLogin = childLogin;
+            this.context = context;
         }
 
         @Override
@@ -176,7 +204,13 @@ public class Info {
             List<Pair<String, String>> pairs = new ArrayList<>();
             pairs.add(new Pair<>(Info.PARENT_LOGIN, parentLogin));
             pairs.add(new Pair<>(Info.CHILD_LOGIN, childLogin));
-
+            Intent shortcut = new Intent(context, ShortcutActivity.class);
+            shortcut.setAction(Intent.ACTION_MAIN);
+            Intent add = new Intent();
+            add.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcut);
+            add.putExtra(Intent.EXTRA_SHORTCUT_NAME, "SOS");
+            add.setAction("com.android.launcher.action.UNINSTALL_SHORTCUT");
+            context.sendBroadcast(add);
             MyHttpResponse myHttpResponse = dataSender.httpPostQuery
                     (Info.LOGOUT_SERVER_URL, pairs, Info.WAIT_TIME);
             return null;

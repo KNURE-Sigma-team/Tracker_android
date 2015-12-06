@@ -12,6 +12,7 @@ import android.util.Pair;
 import com.nure.sigma.wimk.wimk.logic.DataSender;
 import com.nure.sigma.wimk.wimk.logic.Info;
 import com.nure.sigma.wimk.wimk.logic.MyHttpResponse;
+import com.nure.sigma.wimk.wimk.logic.MyNotification;
 import com.nure.sigma.wimk.wimk.logic.Util;
 
 import java.text.SimpleDateFormat;
@@ -31,6 +32,7 @@ public class FailedSenderService extends IntentService {
         ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
+            MyNotification.cancelNotificationOfDroppedInternet(this);
             Util.logRecord(networkInfo.getTypeName());
             Util.fillFileList(getApplicationContext());
 
@@ -67,6 +69,9 @@ public class FailedSenderService extends IntentService {
                 }
                 Util.logRecord("Stop sending failed locations");
             }
+        }
+        else {
+            MyNotification.showNotificationOfDroppedInternet(this);
         }
     }
 
