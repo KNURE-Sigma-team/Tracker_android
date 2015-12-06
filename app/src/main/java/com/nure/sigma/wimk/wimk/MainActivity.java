@@ -16,7 +16,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,14 +56,14 @@ public class MainActivity extends AppCompatActivity {
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                info.startBackgroundService(getApplicationContext());
+                info.startBackgroundServiceAndInfromServer(getApplicationContext());
             }
         });
 
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                info.stopBackgroundService(getApplicationContext());
+                info.stopBackgroundServiceAndInformServer(getApplicationContext());
             }
         });
 
@@ -109,6 +108,15 @@ public class MainActivity extends AppCompatActivity {
             startActivity(
                     new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
         }
+
+//        ConnectivityManager connectivityManager = (ConnectivityManager) this.getApplicationContext().
+//                getSystemService(Context.CONNECTIVITY_SERVICE);
+//
+//        NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
+//        if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+//            startActivity(
+//
+//        }
     }
 
     private boolean checkPlayServices() {

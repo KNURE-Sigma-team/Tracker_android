@@ -24,6 +24,11 @@ public class BackgroundService extends IntentService {
 
     @Override
     public void onDestroy() {
+
+        Log.e("andstepko", "Background service destroyed!");
+
+        Info.getInstance().informStoppedTracking();
+
         super.onDestroy();
     }
 
@@ -61,7 +66,7 @@ public class BackgroundService extends IntentService {
             getApplicationContext().startService(new Intent(getApplicationContext(), BackgroundService.class));
         } else {
             // If not running.
-            stopSelf();
+            // stopSelf();
         }
     }
 }

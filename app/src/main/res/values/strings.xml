@@ -22,6 +22,7 @@
     <string name="no_children_error">You have no children</string>
     <string name="play_services_disabled">Play services are disabled!</string>
     <string name="tracked">already tracked</string>
+    <string name="no_connection">No Internet connection</string>
     <!-- SOSButtonWidget -->
 
 </resources>

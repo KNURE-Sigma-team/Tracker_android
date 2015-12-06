@@ -1,13 +1,11 @@
 package com.nure.sigma.wimk.wimk.logic;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Pair;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -35,7 +33,7 @@ public class SendLocationTask extends AsyncTask<Void, Void, Boolean> {
         }
 
         //Making request`s parameters and finding the most accurate provider.
-        List<Pair<String, String>> pairs = Info.getInstance().getLoginsListForHttp(context);
+        List<Pair<String, String>> pairs = Info.getInstance().getParentAndChildLoginsListForHttp();
         // Location data.
         pairs.add(new Pair<>(Info.LONGITUDE, String.valueOf(location.getLongitude())));
         pairs.add(new Pair<>(Info.LATITUDE, String.valueOf(location.getLatitude())));

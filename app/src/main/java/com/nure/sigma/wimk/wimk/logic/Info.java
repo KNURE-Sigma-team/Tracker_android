@@ -1,6 +1,7 @@
 package com.nure.sigma.wimk.wimk.logic;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -11,6 +12,7 @@ import android.os.BatteryManager;
 import android.util.Pair;
 
 import com.nure.sigma.wimk.wimk.BackgroundService;
+import com.nure.sigma.wimk.wimk.InformStoppedTrackingTask;
 import com.nure.sigma.wimk.wimk.MainActivity;
 
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ public class Info {
 
     public static final String AUTH_SERVER_URL = SERVER_URL + "mobile_authorization";
     public static final String TOKEN_SERVER_URL = SERVER_URL + "mobile_set_child_token";
+    public static final String LOGIN_SERVER_URL = SERVER_URL + "mobile_login";
     public static final String LOGOUT_SERVER_URL = SERVER_URL + "mobile_logout";
     public static final String DROP_GEO_SERVER_URL = SERVER_URL + "mobile_drop_geo";
     public static final String MOBILE_GET_POINT_URL = SERVER_URL + "mobile_get_point";
@@ -73,14 +76,27 @@ public class Info {
     // NON-STATIC
     private List<Pair<Location, String>> failedLocationsList = new ArrayList<>();
     private  List<Child> childList = new ArrayList<>();
+    private SharedPreferences settings = null;
 
+    public SharedPreferences getSettings() {
+        return settings;
+    }
+
+    public void setSettings(SharedPreferences settings) {
+        this.settings = settings;
+    }
+
+    //region child list
     public List<Child> getChildList(){
         return childList;
     }
+
     public void setChildList( List<Child> childList){
         this.childList = childList;
     }
+    //endregion child list
 
+    //region failed locations
     public List<Pair<Location, String>> getFailedLocations(){
         return failedLocationsList;
     }
@@ -92,15 +108,15 @@ public class Info {
     public void clearFailedLocations(){
         failedLocationsList = new ArrayList<>();
     }
+    //endregion failed locations
 
-    public List<Pair<String, String>> getLoginsListForHttp(Context context){
-        SharedPreferences settings = context.getSharedPreferences(Info.PASSWORD, 0);
+    public List<Pair<String, String>> getParentAndChildLoginsListForHttp(){
         String parentLogin = settings.getString(Info.PARENT_LOGIN, null);
         String childLogin = settings.getString(Info.CHILD_LOGIN, null);
 
         ArrayList<Pair<String, String>> result = new ArrayList<>();
-        result.add(new Pair<String, String>(PARENT_LOGIN, parentLogin));
-        result.add(new Pair<String, String>(CHILD_LOGIN, childLogin));
+        result.add(new Pair<>(PARENT_LOGIN, parentLogin));
+        result.add(new Pair<>(CHILD_LOGIN, childLogin));
 
         return result;
     }
@@ -116,42 +132,13 @@ public class Info {
         return (int) (((float) level / (float) scale) * 100.0f);
     }
 
-    public void startBackgroundService(Context context){
-        SharedPreferences settings = context.getSharedPreferences(PASSWORD, 0);
-        SharedPreferences.Editor e = settings.edit();
-
-        e.putBoolean(RUNNING, true);
-        e.apply();
-
-        context.startService(new Intent(context.getApplicationContext(), BackgroundService.class));
-    }
-
-    public void stopBackgroundService(Context context){
-        SharedPreferences settings = context.getSharedPreferences(PASSWORD, 0);
-        SharedPreferences.Editor e = settings.edit();
-        e.putBoolean(RUNNING, false);
-        e.apply();
-
-        context.stopService(new Intent(context, BackgroundService.class));
-    }
-
     public void moveToMainActivity(Activity contextActivity, String childName, int sendingFrequency){
-        stopBackgroundService(contextActivity);
+        stopBackgroundServiceAndInformServer(contextActivity);
 
         // Log out
-        SharedPreferences settings = contextActivity.getSharedPreferences(PASSWORD, 0);
         SharedPreferences.Editor editor = settings.edit();
 
-        String parentLogin = settings.getString(Info.PARENT_LOGIN, null);
-        String childLogin = settings.getString(Info.CHILD_LOGIN, null);
-        if((parentLogin != null) && (childLogin != null)) {
-            LogOutTask logOutTask = new LogOutTask(parentLogin, childLogin);
-            logOutTask.execute();
-        }
-        new LogOutTask(parentLogin, childLogin).execute();
-
         // Save new data to DB
-        editor = settings.edit();
         editor.putString(Info.CHILD_LOGIN, childName);
         editor.putInt(Info.SENDING_FREQUENCY, sendingFrequency);
         editor.commit();
@@ -160,25 +147,86 @@ public class Info {
         contextActivity.startActivity(intent);
     }
 
-    private class LogOutTask extends AsyncTask<Void, Void, Void> {
+    public boolean isBackgroundserviceRunning(Context context){
+        return isMyServiceRunning(BackgroundService.class, context);
+    }
 
-        private String parentLogin;
-        private String childLogin;
-
-        public LogOutTask(String parentLogin, String childLogin) {
-            this.parentLogin = parentLogin;
-            this.childLogin = childLogin;
+    private boolean isMyServiceRunning(Class<?> serviceClass, Context context) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
         }
+        return false;
+    }
 
+    // Can be called from main stream.
+    public void startBackgroundServiceAndInfromServer(Context context){
+
+        if(setRunning(true)){
+            context.startService(new Intent(context.getApplicationContext(), BackgroundService.class));
+            new InformStartedTrackingTask().execute();
+        }
+    }
+
+    // Can be called from main stream.
+    public void stopBackgroundServiceAndInformServer(Context context){
+        if(setRunning(false)){
+            context.stopService(new Intent(context, BackgroundService.class));
+
+            InformStoppedTrackingTask informStoppedTrackingTask = new InformStoppedTrackingTask();
+            informStoppedTrackingTask.execute();
+        }
+    }
+
+    /**
+     *
+     * @return Whether the value was changed or not.
+     */
+    public boolean setRunning(boolean newValue) {
+        if (newValue) {
+            // Setting to running
+            if(!settings.getBoolean(RUNNING, false)) {
+                SharedPreferences.Editor e = settings.edit();
+                e.putBoolean(RUNNING, true);
+                e.apply();
+                return true;
+            }
+            return false;
+        }
+        else {
+            // Setting to NOT running.
+            if (settings.getBoolean(RUNNING, false)) {
+                SharedPreferences.Editor e = settings.edit();
+                e.putBoolean(RUNNING, false);
+                e.apply();
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public MyHttpResponse informStoppedTracking(){
+        DataSender dataSender = new DataSender();
+        List<Pair<String, String>> pairs = getParentAndChildLoginsListForHttp();
+
+        if((pairs.get(0).second != null) && (pairs.get(1).second != null)) {
+            return dataSender.httpPostQuery(Info.LOGOUT_SERVER_URL, pairs, Info.WAIT_TIME);
+        }
+        return null;
+    }
+
+
+    private class InformStartedTrackingTask extends AsyncTask<Void, Void, Void>{
         @Override
         protected Void doInBackground(Void... params) {
             DataSender dataSender = new DataSender();
-            List<Pair<String, String>> pairs = new ArrayList<>();
-            pairs.add(new Pair<>(Info.PARENT_LOGIN, parentLogin));
-            pairs.add(new Pair<>(Info.CHILD_LOGIN, childLogin));
+            List<Pair<String, String>> pairs = getParentAndChildLoginsListForHttp();
 
-            MyHttpResponse myHttpResponse = dataSender.httpPostQuery
-                    (Info.LOGOUT_SERVER_URL, pairs, Info.WAIT_TIME);
+            if((pairs.get(0).second != null) && (pairs.get(1).second != null)) {
+                MyHttpResponse myHttpResponse = dataSender.httpPostQuery(Info.LOGIN_SERVER_URL, pairs, Info.WAIT_TIME);
+            }
             return null;
         }
     }

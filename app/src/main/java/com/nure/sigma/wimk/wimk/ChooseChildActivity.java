@@ -23,6 +23,8 @@ import java.util.List;
  */
 public class ChooseChildActivity extends Activity {
 
+    private Info info = Info.getInstance();
+
     private ListView listView;
 
     @Override
@@ -39,8 +41,13 @@ public class ChooseChildActivity extends Activity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Child child = (Child)adapterView.getAdapter().getItem(i);
 
+                //FIXME !!!
+//                Info.getInstance().moveToMainActivity(ChooseChildActivity.this,
+//                        child.getName(), child.getSendingFrequency());
                 Info.getInstance().moveToMainActivity(ChooseChildActivity.this,
-                        child.getName(), child.getSendingFrequency());
+                        child.getName(), 1);
+
+
             }
         });
     }

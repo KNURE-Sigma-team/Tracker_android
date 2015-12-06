@@ -1,14 +1,12 @@
 package com.nure.sigma.wimk.wimk.logic;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.util.Log;
 import android.util.Pair;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -75,7 +73,7 @@ public class LocationSender {
         Util.logRecord("-------------------------------------------------------------");
 
 
-        List<Pair<String, String>> pairs = Info.getInstance().getLoginsListForHttp(context);
+        List<Pair<String, String>> pairs = Info.getInstance().getParentAndChildLoginsListForHttp();
 
         // Choose, which location to sendLocation.
         Location resultLocation;
@@ -108,6 +106,6 @@ public class LocationSender {
     private MyHttpResponse sendDropGeolocation(){
         DataSender dataSender = new DataSender();
         return dataSender.httpPostQuery(Info.DROP_GEO_SERVER_URL,
-                Info.getInstance().getLoginsListForHttp(context), Info.WAIT_TIME);
+                Info.getInstance().getParentAndChildLoginsListForHttp(), Info.WAIT_TIME);
     }
 }

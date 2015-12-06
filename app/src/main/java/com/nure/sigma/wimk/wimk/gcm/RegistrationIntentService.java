@@ -32,7 +32,6 @@ package com.nure.sigma.wimk.wimk.gcm;
         import com.nure.sigma.wimk.wimk.logic.MyHttpResponse;
 
         import java.io.IOException;
-        import java.util.ArrayList;
         import java.util.List;
 
 public class RegistrationIntentService extends IntentService {
@@ -96,7 +95,7 @@ public class RegistrationIntentService extends IntentService {
 
         SharedPreferences settings = getSharedPreferences(Info.PASSWORD, 0);
         DataSender dataSender = new DataSender();
-        List<Pair<String, String>> pairs = Info.getInstance().getLoginsListForHttp(getApplicationContext());
+        List<Pair<String, String>> pairs = Info.getInstance().getParentAndChildLoginsListForHttp();
         pairs.add(new Pair<String, String>(Info.TOKEN, token));
 
         Log.e("andstepko", "Got token==>" + token);

@@ -45,7 +45,7 @@ public class FailedSenderService extends IntentService {
                 ArrayList<Pair<Location, String>> tempList = new ArrayList<>();
 
                 for (Pair<Location, String> pair : info.getFailedLocations()) {
-                    List<Pair<String, String>> pairs = info.getLoginsListForHttp(getApplicationContext());
+                    List<Pair<String, String>> pairs = info.getParentAndChildLoginsListForHttp();
                     pairs.add(new Pair<>(Info.LONGITUDE, String.valueOf(pair.first.getLongitude())));
                     pairs.add(new Pair<>(Info.LATITUDE, String.valueOf(pair.first.getLatitude())));
                     pairs.add(new Pair<>(Info.TIME, (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
