@@ -11,6 +11,7 @@ import android.util.Log;
 import com.nure.sigma.wimk.wimk.logic.Info;
 import com.nure.sigma.wimk.wimk.logic.LocationSender;
 import com.nure.sigma.wimk.wimk.logic.MyHttpResponse;
+import com.nure.sigma.wimk.wimk.logic.MyNotification;
 import com.nure.sigma.wimk.wimk.logic.Util;
 
 
@@ -34,7 +35,6 @@ public class BackgroundService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-
         SharedPreferences temp = getSharedPreferences(Info.PASSWORD, 0);
         boolean running = temp.getBoolean(Info.RUNNING, false);
         int frequency = temp.getInt(Info.SENDING_FREQUENCY, Info.DEFAULT_SENDING_FREQUENCY);
@@ -42,27 +42,31 @@ public class BackgroundService extends IntentService {
         if (running) {
             LocationSender locationSender = new LocationSender(Info.COMMON, this);
             MyHttpResponse myHttpResponse = locationSender.sendLocation();
-
+            if (myHttpResponse.getErrorCode() == 0) {
+                if (Info.getInstance().isFirstSending()){
+                    startForeground(MyNotification.SENDING_NOTIFICATION_ID,MyNotification.getSuccessfulFirstSendingNotification(this));
+                }
+                else {
+                    startForeground(MyNotification.SENDING_NOTIFICATION_ID, MyNotification.getSuccesBackgroundServiceNotification(this));
+                }
+            }
+            else {
+                if (Info.getInstance().isFirstSending()){
+                    startForeground(MyNotification.SENDING_NOTIFICATION_ID,MyNotification.getFailedFirstSendingNotification(this));
+                }
+                else {
+                    startForeground(MyNotification.SENDING_NOTIFICATION_ID, MyNotification.getFailedBackgroundServiceNotification(this));
+                }
+            }
             Util.logRecord(String.valueOf(myHttpResponse.getErrorCode()));
             Log.i(Info.SERVICE_TAG, "Service Stopping!");
-
-            //Creating notification for starting IntentService in Foreground.
-            Intent notificationIntent = new Intent(this, BackgroundService.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-            Notification notification = new NotificationCompat.Builder(this)
-                    .setContentTitle("WimK")
-                    .setContentIntent(pendingIntent)
-                    .setOngoing(true)
-                    .setContentText("Where is my Kid?")
-                    .setSubText("Some text")
-                    .build();
-            startForeground(300, notification);
 
             try {
                 TimeUnit.SECONDS.sleep(frequency * 60);
             } catch (Exception e) {
                 Log.e(Info.SERVICE_TAG, e.toString());
             }
+            Info.getInstance().setFirstSending(false);
             getApplicationContext().startService(new Intent(getApplicationContext(), BackgroundService.class));
         } else {
             // If not running.

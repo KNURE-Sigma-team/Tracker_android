@@ -2,6 +2,7 @@ package com.nure.sigma.wimk.wimk.logic;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -14,6 +15,9 @@ import android.util.Pair;
 import com.nure.sigma.wimk.wimk.BackgroundService;
 import com.nure.sigma.wimk.wimk.InformStoppedTrackingTask;
 import com.nure.sigma.wimk.wimk.MainActivity;
+import com.nure.sigma.wimk.wimk.R;
+import com.nure.sigma.wimk.wimk.SOSService;
+import com.nure.sigma.wimk.wimk.ShortcutActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +91,17 @@ public class Info {
     }
 
     //region child list
+
+    private boolean firstSending = true;
+
+    public boolean isFirstSending() {
+        return firstSending;
+    }
+
+    public void setFirstSending(boolean firstSending) {
+        this.firstSending = firstSending;
+    }
+
     public List<Child> getChildList(){
         return childList;
     }
@@ -142,7 +157,6 @@ public class Info {
         editor.putString(Info.CHILD_LOGIN, childName);
         editor.putInt(Info.SENDING_FREQUENCY, sendingFrequency);
         editor.commit();
-
         Intent intent = new Intent(contextActivity, MainActivity.class);
         contextActivity.startActivity(intent);
     }

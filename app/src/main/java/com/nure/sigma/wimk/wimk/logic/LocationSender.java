@@ -37,9 +37,10 @@ public class LocationSender {
         boolean networkEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if((!gpsEnabled) && (!networkEnabled)){
             // Both locations are switched off in settings!!!
+            MyNotification.showNotificationOfSwitchedOffGeolocation(context);
             return sendDropGeolocation();
         }
-
+        MyNotification.cancelNotificationOfSwitchedOffGeolocation(context);
         // Geolocation is switched on.
         try {
             locationNETWORK = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);

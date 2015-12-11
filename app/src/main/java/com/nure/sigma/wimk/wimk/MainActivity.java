@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 info.stopBackgroundServiceAndInformServer(getApplicationContext());
+                info.setFirstSending(true);
             }
         });
 
