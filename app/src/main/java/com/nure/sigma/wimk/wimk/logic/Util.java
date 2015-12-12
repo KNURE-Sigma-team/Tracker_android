@@ -106,18 +106,6 @@ public class Util {
         writeListToFile(Info.getInstance().getFailedLocations(), context);
     }
 
-    //Getting battery level.
-//    public static int getBatteryLevel(Context context) {
-//        Intent batteryIntent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-//        int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-//        int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-//        if (level == -1 || scale == -1) {
-//            return 50;
-//        }
-//
-//        return (int) (((float) level / (float) scale) * 100.0f);
-//    }
-
     public static String formatLocation(Location location) {
         if (location == null) {
             return "";

@@ -56,7 +56,7 @@ public class SOSButtonWidget extends AppWidgetProvider {
         serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         PendingIntent pIntent = PendingIntent.getService(context, appWidgetId,
                 serviceIntent, 0);
-        views.setOnClickPendingIntent(R.id.appwidget_text, pIntent);
+        views.setOnClickPendingIntent(R.id.imageButton, pIntent);
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 

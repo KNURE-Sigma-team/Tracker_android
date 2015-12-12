@@ -42,10 +42,10 @@ public class ChooseChildActivity extends Activity {
                 Child child = (Child)adapterView.getAdapter().getItem(i);
 
                 //FIXME !!!
-//                Info.getInstance().moveToMainActivity(ChooseChildActivity.this,
-//                        child.getName(), child.getSendingFrequency());
                 Info.getInstance().moveToMainActivity(ChooseChildActivity.this,
-                        child.getName(), 1);
+                        child.getName(), child.getSendingFrequency());
+     //           Info.getInstance().moveToMainActivity(ChooseChildActivity.this,
+     //                   child.getName(), 1);
 
 
             }

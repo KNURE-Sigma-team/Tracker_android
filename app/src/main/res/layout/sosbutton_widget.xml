@@ -1,15 +1,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:padding="@dimen/widget_margin" android:background="#cc0025"
+    android:padding="@dimen/widget_margin" android:background="@null"
     android:id="@+id/layout">
 
-    <TextView android:id="@+id/appwidget_text" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true" android:text="@string/SOSButton"
-        android:textColor="#ffffff" android:textSize="24sp" android:textStyle="bold|italic"
-        android:layout_margin="8dp" android:contentDescription="@string/appwidget_text"
-        android:background="#cc0029"
-        android:autoText="true"
-        android:allowUndo="true" />
-
+    <ImageButton
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/imageButton"
+        android:src="@drawable/sos"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="@null" />
 </RelativeLayout>

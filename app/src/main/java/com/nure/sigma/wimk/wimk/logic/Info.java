@@ -109,9 +109,7 @@ public class Info {
     public void setChildList( List<Child> childList){
         this.childList = childList;
     }
-    //endregion child list
 
-    //region failed locations
     public List<Pair<Location, String>> getFailedLocations(){
         return failedLocationsList;
     }
@@ -123,7 +121,6 @@ public class Info {
     public void clearFailedLocations(){
         failedLocationsList = new ArrayList<>();
     }
-    //endregion failed locations
 
     public List<Pair<String, String>> getParentAndChildLoginsListForHttp(){
         String parentLogin = settings.getString(Info.PARENT_LOGIN, null);
@@ -165,7 +162,7 @@ public class Info {
         return isMyServiceRunning(BackgroundService.class, context);
     }
 
-    private boolean isMyServiceRunning(Class<?> serviceClass, Context context) {
+    public boolean isMyServiceRunning(Class<?> serviceClass, Context context) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {

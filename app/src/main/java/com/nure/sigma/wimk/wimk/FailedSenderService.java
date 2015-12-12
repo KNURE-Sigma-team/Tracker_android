@@ -47,6 +47,7 @@ public class FailedSenderService extends IntentService {
                 ArrayList<Pair<Location, String>> tempList = new ArrayList<>();
 
                 for (Pair<Location, String> pair : info.getFailedLocations()) {
+                    Util.logRecord("Current item is " + pair.toString());
                     List<Pair<String, String>> pairs = info.getParentAndChildLoginsListForHttp();
                     pairs.add(new Pair<>(Info.LONGITUDE, String.valueOf(pair.first.getLongitude())));
                     pairs.add(new Pair<>(Info.LATITUDE, String.valueOf(pair.first.getLatitude())));
@@ -62,7 +63,6 @@ public class FailedSenderService extends IntentService {
                         tempList.add(new Pair<Location, String>(pair.first, pair.second));
                     }
                 }
-
                 info.clearFailedLocations();
                 for (Pair<Location, String> pair : tempList) {
                     Util.addToFileList(pair, getApplicationContext());
@@ -71,6 +71,7 @@ public class FailedSenderService extends IntentService {
             }
         }
         else {
+            if (Info.getInstance().isBackgroundserviceRunning(this))
             MyNotification.showNotificationOfDroppedInternet(this);
         }
     }

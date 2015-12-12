@@ -3,9 +3,6 @@ package com.nure.sigma.wimk.wimk.logic;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by andstepko on 22.11.15.
- */
 public class Child {
 
     public static final String ARGUMENTS_SPLITTER = ";";
@@ -33,34 +30,32 @@ public class Child {
         this.authorised = authorised;
     }
 
-    public Child(String childString){
+    public Child(String childString) {
         String[] arguments = childString.split(ARGUMENTS_SPLITTER);
-        if(arguments.length == 3){
+        if (arguments.length == 3) {
             name = arguments[0];
             try {
                 sendingFrequency = Integer.parseInt(arguments[1]);
-            }
-            catch (NumberFormatException e){
+            } catch (NumberFormatException e) {
                 sendingFrequency = -1;
                 return;
             }
-            if(!arguments[2].equals(AUTHORISED_CHILD_FALSE)){
+            if (!arguments[2].equals(AUTHORISED_CHILD_FALSE)) {
                 authorised = true;
             }
-        }
-        else {
+        } else {
             sendingFrequency = -1;
         }
     }
 
-    public static List<Child> parseChildrenList(String childrenString){
+    public static List<Child> parseChildrenList(String childrenString) {
         ArrayList<Child> result = new ArrayList<>();
         String childStrings[] = childrenString.split("\n");
         Child child;
 
-        for(String childString : childStrings){
+        for (String childString : childStrings) {
             child = new Child(childString);
-            if(child.getSendingFrequency() != -1){
+            if (child.getSendingFrequency() != -1) {
                 result.add(child);
             }
         }

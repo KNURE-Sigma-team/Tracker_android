@@ -113,8 +113,6 @@ public class LoginActivity extends Activity {
             Log.i("SERVICE", "username==>" + username);
             this.password = password;
             Log.i("SERVICE", "password==>" + password);
-//            this.loginChild = loginChild;
-//            Log.i("SERVICE", "loginChild==>" + loginChild);
         }
 
         @Override
