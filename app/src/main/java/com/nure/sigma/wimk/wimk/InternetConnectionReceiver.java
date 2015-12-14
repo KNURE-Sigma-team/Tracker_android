@@ -14,7 +14,7 @@ public class InternetConnectionReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (!Info.getInstance().isMyServiceRunning(FailedSenderService.class, context))
+        if (!Info.getInstance().isFailedSenderServiceRunning(context))
         context.startService(new Intent(context, FailedSenderService.class));
     }
 }
