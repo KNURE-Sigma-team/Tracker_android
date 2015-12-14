@@ -31,7 +31,7 @@ public class MyNotification {
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.logo_white64)
                 .setContentTitle("Internet connection was lost!!!")
                 .setContentText("Please turn on your internet connection.")
                 .setAutoCancel(false)
@@ -108,7 +108,7 @@ public class MyNotification {
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.logo_white64)
                 .setContentTitle("First sending failed !!!")
                 .setContentText("Service started with error!")
                 .setAutoCancel(false)
@@ -126,7 +126,7 @@ public class MyNotification {
                 PendingIntent.FLAG_ONE_SHOT);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.logo_white64)
                 .setContentTitle("All is fine :-)")
                 .setContentText("Last sending was successful.")
                 .setAutoCancel(false)
@@ -144,7 +144,7 @@ public class MyNotification {
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.logo_white64)
                 .setContentTitle("Sending failed!!!")
                 .setContentText("Last sending failed!")
                 .setAutoCancel(false)
@@ -163,7 +163,7 @@ public class MyNotification {
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.logo_white64)
                 .setContentTitle("SOS message sent.")
                 .setContentText("SOS message sent to your parrent.")
                 .setAutoCancel(true)
@@ -187,7 +187,7 @@ public class MyNotification {
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.logo_white64)
                 .setContentTitle("SOS message sending failed!!!")
                 .setContentText("SOS message didn`t sent!!!")
                 .setAutoCancel(false)

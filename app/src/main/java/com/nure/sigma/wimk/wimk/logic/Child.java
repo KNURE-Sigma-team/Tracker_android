@@ -10,7 +10,7 @@ public class Child {
 
     private String name;
     private int sendingFrequency;
-    private boolean authorised;
+    private int authorised;
 
     public String getName() {
         return name;
@@ -20,11 +20,15 @@ public class Child {
         return sendingFrequency;
     }
 
-    public boolean isAuthorised() {
+    public int getAuthorised() {
         return authorised;
     }
 
-    public Child(String name, int sendingFrequency, boolean authorised) {
+    public void setAuthorised(int authorised) {
+        this.authorised = authorised;
+    }
+
+    public Child(String name, int sendingFrequency, int authorised) {
         this.name = name;
         this.sendingFrequency = sendingFrequency;
         this.authorised = authorised;
@@ -40,8 +44,11 @@ public class Child {
                 sendingFrequency = -1;
                 return;
             }
-            if (!arguments[2].equals(AUTHORISED_CHILD_FALSE)) {
-                authorised = true;
+            try {
+                authorised = Integer.parseInt(arguments[2]);
+            }
+            catch (NumberFormatException e){
+                authorised = 0;
             }
         } else {
             sendingFrequency = -1;

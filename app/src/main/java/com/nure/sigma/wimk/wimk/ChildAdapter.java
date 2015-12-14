@@ -62,7 +62,7 @@ public class ChildAdapter extends BaseAdapter {
         Child child = list.get(i);
         childNameTextView.setText(child.getName());
 
-        if(child.isAuthorised()){
+        if(child.getAuthorised() > 0){
             view.setBackgroundResource(R.color.trackedChildBackgorund);
             trackedTextView.setVisibility(View.VISIBLE);
         }

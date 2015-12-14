@@ -129,34 +129,4 @@ public class Util {
     public static void logRecord(String record) {
         Log.i(Info.getInstance().SERVICE_TAG, record);
     }
-
-    public static boolean isGPSMoreAccurateLocation(Location locationGPS,
-                                                    Location locationNETWORK, Location locationPASSIVE) {
-        try {
-
-            return (locationGPS.getAccuracy() > locationNETWORK.getAccuracy())
-                    && (locationGPS.getAccuracy() > locationPASSIVE.getAccuracy());
-        } catch (NullPointerException e) {
-            if (locationGPS != null) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-
-    public static boolean isNetworkMoreAccurateLocation(Location locationGPS,
-                                                        Location locationNETWORK, Location locationPASSIVE) {
-        try {
-
-            return (locationNETWORK.getAccuracy() > locationGPS.getAccuracy())
-                    && (locationNETWORK.getAccuracy() > locationPASSIVE.getAccuracy());
-        } catch (NullPointerException e) {
-            if (locationNETWORK != null) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
 }

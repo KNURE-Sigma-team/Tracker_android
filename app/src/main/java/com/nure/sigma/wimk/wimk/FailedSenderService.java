@@ -54,7 +54,7 @@ public class FailedSenderService extends IntentService {
                     pairs.add(new Pair<>(Info.TIME, (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
                             .format(new Date(pair.first.getTime()))));
                     pairs.add(new Pair<>(Info.BATTERY_LEVEL, pair.second));
-                    pairs.add(new Pair<>(Info.POINT_TYPE, Info.STORAGED));
+                    pairs.add(new Pair<>(Info.POINT_TYPE, Info.STORED));
                     DataSender dataSender = new DataSender();
                     MyHttpResponse myHttpResponse = dataSender.httpPostQuery(
                             Info.MOBILE_GET_POINT_URL, pairs, Info.WAIT_TIME);

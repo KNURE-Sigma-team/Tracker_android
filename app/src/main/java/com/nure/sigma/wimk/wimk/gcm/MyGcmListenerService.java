@@ -55,7 +55,7 @@ public class MyGcmListenerService extends GcmListenerService {
 
         if(purposeString.equals(GIVE_POINT)){
             LocationSender locationSender = new LocationSender(Info.ON_DEMAND, this);
-            locationSender.sendLocation();
+            locationSender.gainAndSendLocation();
         }
 
 

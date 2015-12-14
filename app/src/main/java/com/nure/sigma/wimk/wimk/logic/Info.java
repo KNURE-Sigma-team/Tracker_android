@@ -61,7 +61,7 @@ public class Info {
 
     public static final String COMMON = "common";
     public static final String SOS = "sos";
-    public static final String STORAGED = "storaged";
+    public static final String STORED = "storaged";
     public static final String ON_DEMAND = "on_demand";
 
     public static final String RUNNING = "running";
@@ -173,21 +173,30 @@ public class Info {
     }
 
     // Can be called from main stream.
-    public void startBackgroundServiceAndInfromServer(Context context){
+    public boolean startBackgroundServiceAndInformServer(Context context){
 
         if(setRunning(true)){
             context.startService(new Intent(context.getApplicationContext(), BackgroundService.class));
             new InformStartedTrackingTask().execute();
+            return true;
+        }
+        else{
+            return false;
         }
     }
 
     // Can be called from main stream.
-    public void stopBackgroundServiceAndInformServer(Context context){
+    public boolean stopBackgroundServiceAndInformServer(Context context){
         if(setRunning(false)){
             context.stopService(new Intent(context, BackgroundService.class));
 
             InformStoppedTrackingTask informStoppedTrackingTask = new InformStoppedTrackingTask();
             informStoppedTrackingTask.execute();
+
+            return true;
+        }
+        else{
+            return false;
         }
     }
 
@@ -223,6 +232,7 @@ public class Info {
         List<Pair<String, String>> pairs = getParentAndChildLoginsListForHttp();
 
         if((pairs.get(0).second != null) && (pairs.get(1).second != null)) {
+            // Values of parent name and child name are not null.
             return dataSender.httpPostQuery(Info.LOGOUT_SERVER_URL, pairs, Info.WAIT_TIME);
         }
         return null;

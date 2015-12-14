@@ -3,8 +3,8 @@
     package="com.nure.sigma.wimk.wimk">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
@@ -15,6 +15,14 @@
 
     <permission
         android:name="com.nure.sigma.wimk.wimk.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <permission
+        android:name="android.permission.ACCESS_FINE_LOCATION"
+        android:protectionLevel="signature" />
+
+    <permission
+        android:name="android.permission.ACCESS_COARSE_LOCATION"
         android:protectionLevel="signature" />
 
     <uses-permission android:name="com.nure.sigma.wimk.wimk.permission.C2D_MESSAGE" />
@@ -28,7 +36,6 @@
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"
             android:taskAffinity="com.nure.wimk.wimk.LoginActivity">
             <intent-filter>
                 <action android:name=".LoginActivity" />
@@ -59,6 +66,7 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
+
         <receiver
             android:name=".InternetConnectionReceiver"
             android:enabled="true"
@@ -68,6 +76,7 @@
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
             </intent-filter>
         </receiver>
+
         <receiver
             android:name=".SOSButtonWidget"
             android:enabled="true"
@@ -81,6 +90,7 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/sosbutton_widget_info" />
         </receiver>
+
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"
@@ -99,6 +109,7 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
+
         <service
             android:name=".gcm.MyInstanceIDListenerService"
             android:exported="false">

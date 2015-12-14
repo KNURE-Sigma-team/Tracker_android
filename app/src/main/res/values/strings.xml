@@ -23,6 +23,12 @@
     <string name="play_services_disabled">Play services are disabled!</string>
     <string name="tracked">already tracked</string>
     <string name="no_connection">No Internet connection</string>
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="continue_anywhay">Continue anywhay</string>
+    <string name="back_to_permissions">Back to permissions</string>
+    <string name="are_you_sure_message">Our application won\'t be able to work without location.</string>
+    <string name="service_stoped">Sending location stopped</string>
+    <string name="service_started">Sending location started</string>
     <!-- SOSButtonWidget -->
 
 </resources>

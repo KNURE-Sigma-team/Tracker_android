@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -44,6 +45,16 @@ public class LoginActivity extends Activity {
         passwordEditText = (EditText) findViewById(R.id.password_editText);
         Button loginButton = (Button) findViewById(R.id.login_btn);
 
+        passwordEditText.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    login(usernameEditText.getText().toString(), passwordEditText.getText().toString());
+                    return true;
+                }
+                return false;
+            }
+        });
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,10 +75,13 @@ public class LoginActivity extends Activity {
 
         //TODO save username and password to preferences somehow
 
+        boolean needDecreaseTrackingNumber = false;
         if(!info.isBackgroundserviceRunning(LoginActivity.this)) {
             // Background service is switched off.
             if(info.setRunning(false)) {
-                // Running was set to false successfully, means this value was true.
+                // 'Running' value was set to false successfully, means this value was true.
+                // Send logout message to server
+                needDecreaseTrackingNumber = true;
                 new InformStoppedTrackingTask().execute();
             }
         }
@@ -76,17 +90,26 @@ public class LoginActivity extends Activity {
         if(children.size() == 0){
             Toast.makeText(this, getString(R.string.no_children_error), Toast.LENGTH_LONG).show();
             return;
-        }
-        if(children.size() == 1){
-            Child child = children.get(0);
+        } else {
+            if(needDecreaseTrackingNumber){
+                String prevChildName = info.getSettings().getString(Info.CHILD_LOGIN, null);
+                for(Child child : children){
+                    if(child.getName().equals(prevChildName)){
+                        child.setAuthorised(child.getAuthorised() - 1);
+                    }
+                }
+            }
+            // More than 0 children
+            if (children.size() == 1) {
+                Child child = children.get(0);
 
-            // FIXME
-            //info.moveToMainActivity(LoginActivity.this, child.getName(), child.getSendingFrequency());
-            info.moveToMainActivity(LoginActivity.this, child.getName(), 1);
-        }
-        else{
-            // Have many children
-            moveToChooseChildActivity(children);
+                // FIXME
+                //info.moveToMainActivity(LoginActivity.this, child.getName(), child.getSendingFrequency());
+                info.moveToMainActivity(LoginActivity.this, child.getName(), 1);
+            } else {
+                // Have many children
+                moveToChooseChildActivity(children);
+            }
         }
     }
 
@@ -172,9 +195,8 @@ public class LoginActivity extends Activity {
                 e.commit();
 
                 afterSuccessfulLogin(response);
+                passwordEditText.setText(info.EMPTY_STRING);
             }
-
-            passwordEditText.setText(info.EMPTY_STRING);
             this.loadingDialog.dismiss();
             LoginActivity.this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }

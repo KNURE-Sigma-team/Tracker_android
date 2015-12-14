@@ -2,7 +2,6 @@ package com.nure.sigma.wimk.wimk;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
@@ -42,7 +41,7 @@ public class SOSService extends IntentService {
             }
         });
         LocationSender locationSender = new LocationSender(Info.SOS, this);
-        MyHttpResponse myHttpResponse = locationSender.sendLocation();
+        MyHttpResponse myHttpResponse = locationSender.gainAndSendLocation();
         if (myHttpResponse.getErrorCode() == 0) {
             MyNotification.showNotificationOfSuccessfulSOSMessageSending(this);
         } else {

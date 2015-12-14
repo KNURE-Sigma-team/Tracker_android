@@ -56,8 +56,7 @@
             android:id="@+id/stop_button"
             android:background="@color/colorAccent"
             android:layout_below="@id/start_button"
-            android:layout_centerHorizontal="true"
-            android:layout_marginLeft="50dp"/>
+            android:layout_centerHorizontal="true"/>
 
     </LinearLayout>
 

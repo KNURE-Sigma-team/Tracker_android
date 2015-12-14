@@ -39,33 +39,41 @@ public class BackgroundService extends IntentService {
 
         if (running) {
             LocationSender locationSender = new LocationSender(Info.COMMON, this);
-            MyHttpResponse myHttpResponse = locationSender.sendLocation();
+            MyHttpResponse myHttpResponse = locationSender.gainAndSendLocation();
             if (myHttpResponse.getErrorCode() == 0) {
                 if (Info.getInstance().isFirstSending()) {
-                    startForeground(MyNotification.SENDING_NOTIFICATION_ID, MyNotification.getSuccessfulFirstSendingNotification(this));
+                    startForeground(MyNotification.SENDING_NOTIFICATION_ID,
+                            MyNotification.getSuccessfulFirstSendingNotification(this));
                     Toast.makeText(this,"First sending was successful.",Toast.LENGTH_LONG).show();
                 } else {
-                    startForeground(MyNotification.SENDING_NOTIFICATION_ID, MyNotification.getSuccesBackgroundServiceNotification(this));
+                    startForeground(MyNotification.SENDING_NOTIFICATION_ID,
+                            MyNotification.getSuccesBackgroundServiceNotification(this));
                 }
             } else {
+                // errorCode != 0
                 if (Info.getInstance().isFirstSending()) {
-                    startForeground(MyNotification.SENDING_NOTIFICATION_ID, MyNotification.getFailedFirstSendingNotification(this));
-                    Toast.makeText(this,"First sending was failed!!!",Toast.LENGTH_LONG).show();
+                    startForeground(MyNotification.SENDING_NOTIFICATION_ID,
+                            MyNotification.getFailedFirstSendingNotification(this));
+                    Toast.makeText(this,"First sending has failed!!!",Toast.LENGTH_LONG).show();
                 } else {
-                    startForeground(MyNotification.SENDING_NOTIFICATION_ID, MyNotification.getFailedBackgroundServiceNotification(this));
+                    startForeground(MyNotification.SENDING_NOTIFICATION_ID,
+                            MyNotification.getFailedBackgroundServiceNotification(this));
                 }
             }
             Util.logRecord(String.valueOf(myHttpResponse.getErrorCode()));
             Log.i(Info.SERVICE_TAG, "Service Stopping!");
 
             try {
-                TimeUnit.SECONDS.sleep(frequency * 60);
+                // 60 seconds in minute
+                // 1000 ms in s
+                TimeUnit.SECONDS.sleep(frequency * 60 - (LocationSender.TOTAL_WAIT_TIME / 1000));
             } catch (Exception e) {
                 Log.e(Info.SERVICE_TAG, e.toString());
             }
             Info.getInstance().setFirstSending(false);
             getApplicationContext().startService(new Intent(getApplicationContext(), BackgroundService.class));
         } else {
+            // Not running.
             stopSelf();
         }
     }
