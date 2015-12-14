@@ -51,30 +51,31 @@ public class LocationSender {
 
         batteryLevel = Info.getInstance().getBatteryLevel(context.getApplicationContext());
 
+        if(!pointType.equals(Info.ON_DEMAND)) {
+            emptyLocationListener = new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
 
-        emptyLocationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
+                }
 
-            }
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
 
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
+                }
 
-            }
+                @Override
+                public void onProviderEnabled(String provider) {
 
-            @Override
-            public void onProviderEnabled(String provider) {
+                }
 
-            }
+                @Override
+                public void onProviderDisabled(String provider) {
 
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        };
-        gainGPSLocation(locationManager);
-        gainNETWORKLocation(locationManager);
+                }
+            };
+            gainGPSLocation(locationManager);
+            gainNETWORKLocation(locationManager);
+        }
 
         try {
             Thread.currentThread().sleep(TOTAL_WAIT_TIME);
@@ -84,13 +85,14 @@ public class LocationSender {
 
         getLastKnownLocation(locationManager);
 
-        // Unbind listeners
-        try {
-            locationManager.removeUpdates(emptyLocationListener);
-        }
-        catch (SecurityException e){
-            e.printStackTrace();
-            Util.logRecord("SECURITY_EXCEPTION");
+        if(!pointType.equals(Info.ON_DEMAND)) {
+            // Unbind listeners
+            try {
+                locationManager.removeUpdates(emptyLocationListener);
+            } catch (SecurityException e) {
+                e.printStackTrace();
+                Util.logRecord("SECURITY_EXCEPTION");
+            }
         }
 
         return chooseProperAndSend(locationManager);
@@ -212,6 +214,7 @@ public class LocationSender {
         DataSender dataSender = new DataSender();
         MyHttpResponse myHttpResponse = dataSender.httpPostQuery(Info.MOBILE_GET_POINT_URL, pairs, Info.WAIT_TIME);
         if (myHttpResponse.getErrorCode() != MyHttpResponse.OK) {
+            // Store
             resultLocation.setTime(new Date().getTime());
             Util.addToFileList(new Pair<>(resultLocation,
                     String.valueOf(batteryLevel)), context);
