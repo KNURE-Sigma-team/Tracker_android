@@ -11,7 +11,6 @@ import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 
 import com.nure.sigma.wimk.wimk.LoginActivity;
-import com.nure.sigma.wimk.wimk.MainActivity;
 import com.nure.sigma.wimk.wimk.R;
 
 public class MyNotification {
@@ -20,7 +19,6 @@ public class MyNotification {
     public static final int DROPPED_INTERNET_NOTIFICATION_ID = 301;
     public static final int SWITCHED_OFF_GEOLOCATION_NOTIFICATION_ID = 302;
     public static final int SOS_MESSAGE_SENT_NOTIFICATION_ID = 303;
-    public static final int FAILED_DISPATCHES_SENDING_NOTIFICATION_ID = 304;
 
 
     public static void showNotificationOfDroppedInternet(Context context) {
@@ -81,6 +79,24 @@ public class MyNotification {
         notificationManager.cancel(SWITCHED_OFF_GEOLOCATION_NOTIFICATION_ID);
     }
 
+    public static Notification getStartBackgroundServiceNotification(Context context) {
+        Intent intent = new Intent(context, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent,
+                PendingIntent.FLAG_ONE_SHOT);
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.mipmap.logo_white64)
+                .setContentTitle("Sending location...")
+                .setContentText("Please, wait...")
+                .setAutoCancel(false)
+                .setContentIntent(pendingIntent)
+                .setSound(null)
+                .setPriority(Notification.PRIORITY_LOW)
+                .setTicker("WimK notification");
+        return notificationBuilder.build();
+    }
+
     public static Notification getSuccessfulFirstSendingNotification(Context context) {
         Intent intent = new Intent(context, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -131,6 +147,7 @@ public class MyNotification {
                 .setContentText("Last sending was successful.")
                 .setAutoCancel(false)
                 .setContentIntent(pendingIntent)
+                .setSound(null)
                 .setPriority(Notification.PRIORITY_LOW)
                 .setTicker("WimK notification");
         return notificationBuilder.build();

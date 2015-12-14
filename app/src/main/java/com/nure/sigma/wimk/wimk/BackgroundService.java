@@ -38,6 +38,8 @@ public class BackgroundService extends IntentService {
         int frequency = temp.getInt(Info.SENDING_FREQUENCY, Info.DEFAULT_SENDING_FREQUENCY);
 
         if (running) {
+            startForeground(MyNotification.SENDING_NOTIFICATION_ID,
+                    MyNotification.getStartBackgroundServiceNotification(this));
             LocationSender locationSender = new LocationSender(Info.COMMON, this);
             MyHttpResponse myHttpResponse = locationSender.gainAndSendLocation();
             if (myHttpResponse.getErrorCode() == 0) {
