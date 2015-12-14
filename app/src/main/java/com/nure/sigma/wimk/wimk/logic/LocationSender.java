@@ -16,8 +16,8 @@ import java.util.List;
 public class LocationSender {
 
     public static final String SERVICE_TAG = "SERVICE";
-    public static final int MIN_UPDATING_TIME = 10000;
-    public static final long TOTAL_WAIT_TIME = MIN_UPDATING_TIME * 3;
+    public static final int MIN_UPDATING_TIME = 1000;
+    public static final long TOTAL_WAIT_TIME = MIN_UPDATING_TIME * 20;
 
     private int batteryLevel;
     private Location locationPASSIVE = null;
@@ -51,6 +51,7 @@ public class LocationSender {
 
         batteryLevel = Info.getInstance().getBatteryLevel(context.getApplicationContext());
 
+
         emptyLocationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
@@ -72,7 +73,6 @@ public class LocationSender {
 
             }
         };
-
         gainGPSLocation(locationManager);
         gainNETWORKLocation(locationManager);
 
@@ -84,7 +84,16 @@ public class LocationSender {
 
         getLastKnownLocation(locationManager);
 
-        return chooseProperAndSend();
+        // Unbind listeners
+        try {
+            locationManager.removeUpdates(emptyLocationListener);
+        }
+        catch (SecurityException e){
+            e.printStackTrace();
+            Util.logRecord("SECURITY_EXCEPTION");
+        }
+
+        return chooseProperAndSend(locationManager);
     }
 
     private void gainGPSLocation(LocationManager locationManager){
@@ -115,6 +124,7 @@ public class LocationSender {
     private void getLastKnownLocation(LocationManager locationManager){
         try {
             locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Log.e("andstepko", "locationGPS.getTime()==>" + locationGPS.getTime());
         }
         catch (SecurityException e){
             e.printStackTrace();
@@ -122,8 +132,7 @@ public class LocationSender {
         }
         try {
             locationNETWORK = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-            locationManager.removeUpdates(emptyLocationListener);
+            Log.e("andstepko", "locationNETWORK.getTime()==>" + locationNETWORK.getTime());
         }
         catch (SecurityException e){
             e.printStackTrace();
@@ -138,18 +147,20 @@ public class LocationSender {
         }
     }
 
-    private MyHttpResponse chooseProperAndSend(){
+    private MyHttpResponse chooseProperAndSend(LocationManager locationManager){
         // Choose, which location to gainAndSendLocation.
 
-        Log.e("andstepko", "chooseProperAndSend");
-        Log.e("andstepko", "locationGPS.getAccuracy()==>" + locationGPS.getAccuracy());
-        Log.e("andstepko", "locationNETWORK.getAccuracy()==>" + locationNETWORK.getAccuracy());
+//        Log.e("andstepko", "chooseProperAndSend");
+//        Log.e("andstepko", "locationGPS.getAccuracy()==>" + locationGPS.getAccuracy());
+//        Log.e("andstepko", "locationNETWORK.getAccuracy()==>" + locationNETWORK.getAccuracy());
 
-                Location resultLocation;
-        if (isFirstLocationMostAccurate(locationGPS, locationNETWORK, locationPASSIVE)) {
+        Location resultLocation;
+        if (isFirstLocationMostAccurate(locationGPS, locationNETWORK, locationPASSIVE) &&
+                ((locationGPS.getTime() - locationNETWORK.getTime()) > - (1000 * 10))) {
             Log.e("andstepko", "Chose GPS location");
             resultLocation = locationGPS;
-        } else if (isFirstLocationMostAccurate(locationNETWORK, locationGPS, locationPASSIVE)) {
+        //} else if (isFirstLocationMostAccurate(locationNETWORK, locationGPS, locationPASSIVE)) {
+        } else if (locationNETWORK != null) {
             Log.e("andstepko", "Do not get GPS location, but NETWORK");
             resultLocation = locationNETWORK;
         } else {
@@ -208,7 +219,7 @@ public class LocationSender {
         return myHttpResponse;
     }
 
-    private MyHttpResponse sendDropGeolocation(){
+    private MyHttpResponse sendDropGeolocation() {
 
         Log.e("andstepko", "sendDropGeolocation");
 
