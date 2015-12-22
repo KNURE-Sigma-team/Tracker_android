@@ -58,8 +58,6 @@ public class MyGcmListenerService extends GcmListenerService {
             locationSender.gainAndSendLocation();
         }
 
-
-
         /**
          * In some cases it may be useful to show a notification indicating to the user
          * that a message was received.

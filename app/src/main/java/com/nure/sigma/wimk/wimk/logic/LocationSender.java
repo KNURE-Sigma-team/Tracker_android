@@ -4,7 +4,9 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.util.Pair;
 
@@ -17,7 +19,8 @@ public class LocationSender {
 
     public static final String SERVICE_TAG = "SERVICE";
     public static final int MIN_UPDATING_TIME = 1000;
-    public static final long TOTAL_WAIT_TIME = MIN_UPDATING_TIME * 20;
+    public static final long TOTAL_WAIT_TIME = MIN_UPDATING_TIME * 10;
+    public static final long TOTAL_ON_DEMAND_WAIT_TIME = MIN_UPDATING_TIME * 5;
 
     private int batteryLevel;
     private Location locationPASSIVE = null;
@@ -35,13 +38,13 @@ public class LocationSender {
 
     public MyHttpResponse gainAndSendLocation() {
         Log.i(SERVICE_TAG, "Service Started!");
-        LocationManager locationManager = (LocationManager) context
+        final LocationManager locationManager = (LocationManager) context
                 .getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
 
         boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         boolean networkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         if ((!gpsEnabled) && (!networkEnabled)) {
-            // Both locations are switched off in settings!!!
+            Log.e("andstepko", "// Both locations are switched off in settings!!!");
             MyNotification.showNotificationOfSwitchedOffGeolocation(context);
             return sendDropGeolocation();
         }
@@ -75,24 +78,69 @@ public class LocationSender {
             };
             gainGPSLocation(locationManager);
             gainNETWORKLocation(locationManager);
-        }
 
-        try {
-            Thread.currentThread().sleep(TOTAL_WAIT_TIME);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            try {
+                Thread.currentThread().sleep(TOTAL_WAIT_TIME);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            // On demand.
+            class UserLocationThread extends Thread {
+                public void run() {
+                    try {
+                        Looper.prepare();
+                        emptyLocationListener = new LocationListener() {
+                            @Override
+                            public void onLocationChanged(Location location) {
+
+                            }
+
+                            @Override
+                            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+                            }
+
+                            @Override
+                            public void onProviderEnabled(String provider) {
+
+                            }
+
+                            @Override
+                            public void onProviderDisabled(String provider) {
+
+                            }
+                        };
+                        gainGPSLocation(locationManager);
+                        gainNETWORKLocation(locationManager);
+                        //Looper.loop();
+                    } catch (Exception e) {
+                        //...
+                    }
+                }
+            }
+            UserLocationThread userLocationThread = new UserLocationThread();
+            userLocationThread.run();
+
+            Log.e("andstepko", "On demand. Thread started sleeping");
+            try {
+                Thread.currentThread().sleep(TOTAL_ON_DEMAND_WAIT_TIME);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            userLocationThread.interrupt();
         }
 
         getLastKnownLocation(locationManager);
 
-        if(!pointType.equals(Info.ON_DEMAND)) {
-            // Unbind listeners
-            try {
-                locationManager.removeUpdates(emptyLocationListener);
-            } catch (SecurityException e) {
-                e.printStackTrace();
-                Util.logRecord("SECURITY_EXCEPTION");
-            }
+        // Unbind listeners
+        try {
+            locationManager.removeUpdates(emptyLocationListener);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Util.logRecord("SECURITY_EXCEPTION");
         }
 
         return chooseProperAndSend(locationManager);
@@ -124,9 +172,13 @@ public class LocationSender {
     }
 
     private void getLastKnownLocation(LocationManager locationManager){
+
+        Log.e("andstepko", "getLastKnownLocation");
         try {
             locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            Log.e("andstepko", "locationGPS.getTime()==>" + locationGPS.getTime());
+            if(locationGPS != null) {
+                Log.e("andstepko", "locationGPS.getTime()==>" + locationGPS.getTime());
+            }
         }
         catch (SecurityException e){
             e.printStackTrace();
@@ -134,7 +186,9 @@ public class LocationSender {
         }
         try {
             locationNETWORK = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            Log.e("andstepko", "locationNETWORK.getTime()==>" + locationNETWORK.getTime());
+            if(locationNETWORK != null) {
+                Log.e("andstepko", "locationNETWORK.getTime()==>" + locationNETWORK.getTime());
+            }
         }
         catch (SecurityException e){
             e.printStackTrace();
@@ -158,7 +212,7 @@ public class LocationSender {
 
         Location resultLocation;
         if (isFirstLocationMostAccurate(locationGPS, locationNETWORK, locationPASSIVE) &&
-                ((locationGPS.getTime() - locationNETWORK.getTime()) > - (1000 * 10))) {
+                ((locationGPS.getTime() - locationNETWORK.getTime()) > -TOTAL_WAIT_TIME)) {
             Log.e("andstepko", "Chose GPS location");
             resultLocation = locationGPS;
         //} else if (isFirstLocationMostAccurate(locationNETWORK, locationGPS, locationPASSIVE)) {
@@ -227,7 +281,7 @@ public class LocationSender {
         Log.e("andstepko", "sendDropGeolocation");
 
         DataSender dataSender = new DataSender();
-        return dataSender.httpPostQuery(Info.DROP_GEO_SERVER_URL,
+        return dataSender.httpPostQuery(Info.   DROP_GEO_SERVER_URL,
                 Info.getInstance().getParentAndChildLoginsListForHttp(), Info.WAIT_TIME);
     }
 }

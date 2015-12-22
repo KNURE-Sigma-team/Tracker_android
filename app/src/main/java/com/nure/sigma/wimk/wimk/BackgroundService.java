@@ -65,13 +65,6 @@ public class BackgroundService extends IntentService {
             Util.logRecord(String.valueOf(myHttpResponse.getErrorCode()));
             Log.i(Info.SERVICE_TAG, "Service Stopping!");
 
-
-            frequency = 1;
-
-
-
-
-
             try {
                 // 60 seconds in minute
                 // 1000 ms in s
